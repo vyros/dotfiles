@@ -1,0 +1,1 @@
+git config --global alias.glog 'log --graph --pretty --oneline --decorate --branches --tags --remotes'
