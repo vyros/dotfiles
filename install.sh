@@ -26,10 +26,21 @@ symlink "$DOTFILES/vim/vimrc"     "$HOME/.vimrc"
 symlink "$DOTFILES/vim/setup.sh"  "$HOME/.vim/setup.sh"
 symlink "$DOTFILES/vim/README.md" "$HOME/.vim/README.md"
 
+# ── tmux ──────────────────────────────────────────────────────────────────────
+info "Configuration tmux..."
+symlink "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
+symlink "$DOTFILES/tmux/README.md" "$HOME/.tmux-README.md"
+
+# TPM (Tmux Plugin Manager)
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+    info "Bootstrap de TPM..."
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
+
 # ── Dépendances + plugins ─────────────────────────────────────────────────────
 read -rp "[?] Installer les dépendances et les plugins ? [o/N] " answer
 if [[ ${answer,,} == "o" ]]; then
     bash "$DOTFILES/vim/setup.sh"
 fi
 
-info "Terminé."
+info "Terminé. Dans tmux, appuie sur C-a I pour installer les plugins tmux."
