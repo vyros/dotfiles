@@ -6,14 +6,14 @@ Configuration IDE pour Vim 9.2+, basée sur `vim-plug`.
 
 ### Nouvelle machine
 
-Copier `~/.vimrc` et `~/.vim/setup.sh`, puis lancer :
-
 ```bash
-mkdir -p ~/.vim
-bash ~/.vim/setup.sh
+git clone <url> ~/dotfiles
+bash ~/dotfiles/install.sh
 ```
 
-Le script installe automatiquement les dépendances système, les serveurs LSP et les plugins Vim. Fonctionne sur **Arch Linux** et **Debian 12+**.
+`install.sh` crée les symlinks (`~/.vimrc`, `~/.vim/setup.sh`, `~/.vim/README.md`) puis propose d'installer les dépendances et les plugins via `setup.sh`.
+
+`setup.sh` installe automatiquement les dépendances système, les serveurs LSP et les plugins Vim. Fonctionne sur **Arch Linux** et **Debian 12+**.
 
 ### Plugins uniquement
 
