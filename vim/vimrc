@@ -1,0 +1,377 @@
+" ============================================================
+" PLUGINS
+" ============================================================
+call plug#begin('~/.vim/plugged')
+
+Plug 'morhetz/gruvbox'                                       " colorscheme
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }         " fuzzy search
+Plug 'junegunn/fzf.vim'
+Plug 'yegappan/lsp'                                          " LSP (Vim9Script)
+Plug 'tpope/vim-fugitive'                                    " git commands
+Plug 'airblade/vim-gitgutter'                                " git signs in gutter
+Plug 'tpope/vim-commentary'                                  " gcc / gc{motion}
+Plug 'jiangmiao/auto-pairs'                                  " auto-close brackets
+Plug 'tpope/vim-surround'                                    " cs"' ds( ysiw)
+Plug 'tpope/vim-vinegar'                                     " - to browse files
+
+call plug#end()
+
+" ============================================================
+" GENERAL
+" ============================================================
+set nocompatible
+filetype plugin indent on
+syntax on
+
+set encoding=utf-8
+set hidden                     " switch buffers without saving
+set autoread
+set autowrite
+set noswapfile
+set history=5000
+set updatetime=300
+
+" indentation
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set softtabstop=-1
+set smarttab
+
+" search
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+set showmatch
+
+" display
+set number
+set relativenumber
+set cursorline
+set colorcolumn=112
+set scrolloff=5
+set wrap
+set signcolumn=yes             " always show gutter (LSP diagnostics, git)
+set list
+set listchars=tab:>─,eol:¬,trail:\ ,nbsp:¤
+set fillchars=vert:\│
+
+" completion menu
+set completeopt=menuone,noinsert,noselect
+set shortmess+=c               " no "match X of Y" noise
+
+" folds
+set foldmethod=indent
+set foldlevelstart=99          " all folds open by default
+
+" splits open naturally
+set splitright
+set splitbelow
+
+" persistent undo
+set undofile
+set undodir=~/.vim/undo//
+
+if has('mouse')
+    set mouse=a
+endif
+
+" ============================================================
+" STATUSLINE
+" ============================================================
+set laststatus=2
+set showmode
+set wildmenu
+set wildmode=longest:full,full
+
+function! LspStatus() abort
+    let l:counts = lsp#lsp#ErrorCount()
+    if empty(l:counts) | return '' | endif
+    let l:e = get(l:counts, 'Error', 0)
+    let l:w = get(l:counts, 'Warning', 0)
+    return l:e > 0 ? printf(' E:%d W:%d', l:e, l:w) : l:w > 0 ? printf(' W:%d', l:w) : ' OK'
+endfunction
+
+set statusline=
+set statusline+=%f             " filename
+set statusline+=\ %m%r         " modified/readonly
+set statusline+=%=             " right side
+set statusline+=%{FugitiveStatusline()} " git branch
+set statusline+=%{LspStatus()} " LSP diagnostics
+set statusline+=\ %Y           " filetype
+set statusline+=\ %l:%c        " line:col
+set statusline+=\ %p%%         " percentage
+
+" ============================================================
+" COLORSCHEME
+" ============================================================
+set termguicolors
+set background=dark
+let g:gruvbox_contrast_dark = 'medium'
+let g:gruvbox_italic = 1
+silent! colorscheme gruvbox
+
+" ============================================================
+" LEADER
+" ============================================================
+let mapleader = ' '
+let maplocalleader = ' '
+
+" ============================================================
+" KEYMAPS — NAVIGATION
+" ============================================================
+" split navigation with Ctrl-hjkl
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" resize splits
+nnoremap <C-Left>  <C-w><
+nnoremap <C-Right> <C-w>>
+nnoremap <C-Up>    <C-w>+
+nnoremap <C-Down>  <C-w>-
+
+" buffer navigation
+nnoremap <leader>bn :bnext<CR>
+nnoremap <leader>bp :bprev<CR>
+nnoremap <leader>bd :bdelete<CR>
+nnoremap <leader>bl :ls<CR>:b<Space>
+
+" clear search highlight
+nnoremap <leader>/ :nohlsearch<CR>
+
+" quick escape in insert mode
+inoremap jk <ESC>
+
+" keep visual selection after indent
+vnoremap < <gv
+vnoremap > >gv
+
+" move lines up/down
+nnoremap <A-j> :move .+1<CR>==
+nnoremap <A-k> :move .-2<CR>==
+vnoremap <A-j> :move '>+1<CR>gv=gv
+vnoremap <A-k> :move '<-2<CR>gv=gv
+
+" ============================================================
+" KEYMAPS — TERMINAL
+" ============================================================
+nnoremap <leader>tt :terminal<CR>
+nnoremap <leader>tv :vertical terminal<CR>
+tnoremap <Esc> <C-\><C-n>         " exit terminal mode with Esc
+
+" ============================================================
+" FZF
+" ============================================================
+let g:fzf_layout = { 'down': '40%' }
+
+" use ripgrep for :Files
+if executable('rg')
+    let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git"'
+endif
+
+nnoremap <leader>ff :Files<CR>
+nnoremap <leader>fg :Rg<CR>
+nnoremap <leader>fb :Buffers<CR>
+nnoremap <leader>fh :History<CR>
+nnoremap <leader>ft :BTags<CR>
+nnoremap <leader>fl :BLines<CR>
+
+" ============================================================
+" LSP (yegappan/lsp — Vim9Script)
+" ============================================================
+function! s:SetupLsp()
+    call LspOptionsSet(#{
+        \ autoComplete: v:true,
+        \ completionMatcher: 'fuzzy',
+        \ showDiagWithSign: v:true,
+        \ showDiagWithVirtualText: v:true,
+        \ showInlayHints: v:true,
+        \ highlightDiagInline: v:true,
+        \ aleSupport: v:false,
+        \ noNewlineInCompletion: v:true,
+        \})
+
+    let l:candidates = [
+        \#{
+        \  name: 'clangd',
+        \  filetype: ['c', 'cpp', 'objc'],
+        \  path: 'clangd',
+        \  args: ['--background-index', '--clang-tidy'],
+        \},
+        \#{
+        \  name: 'pylsp',
+        \  filetype: ['python'],
+        \  path: 'pylsp',
+        \  args: [],
+        \},
+        \#{
+        \  name: 'pyright',
+        \  filetype: ['python'],
+        \  path: 'pyright-langserver',
+        \  args: ['--stdio'],
+        \},
+        \#{
+        \  name: 'tsserver',
+        \  filetype: ['javascript', 'typescript', 'javascriptreact', 'typescriptreact'],
+        \  path: 'typescript-language-server',
+        \  args: ['--stdio'],
+        \},
+        \#{
+        \  name: 'rust-analyzer',
+        \  filetype: ['rust'],
+        \  path: 'rust-analyzer',
+        \  args: [],
+        \},
+        \#{
+        \  name: 'gopls',
+        \  filetype: ['go'],
+        \  path: 'gopls',
+        \  args: [],
+        \},
+        \#{
+        \  name: 'lua-language-server',
+        \  filetype: ['lua'],
+        \  path: 'lua-language-server',
+        \  args: [],
+        \},
+        \#{
+        \  name: 'docker-langserver',
+        \  filetype: ['dockerfile'],
+        \  path: expand('~/.local/bin/docker-langserver'),
+        \  args: ['--stdio'],
+        \},
+        \#{
+        \  name: 'docker-compose-langserver',
+        \  filetype: ['yaml.docker-compose'],
+        \  path: expand('~/.local/bin/docker-compose-langserver'),
+        \  args: ['--stdio'],
+        \},
+        \]
+
+    let l:servers = filter(l:candidates, 'executable(v:val.path)')
+    if !empty(l:servers)
+        call LspAddServer(l:servers)
+    endif
+endfunction
+
+augroup LspSetup
+    au!
+    au User LspSetup call s:SetupLsp()
+augroup END
+
+" LSP keymaps (active only when LSP is attached)
+augroup LspKeymaps
+    au!
+    au User LspAttached call s:LspKeymaps()
+augroup END
+
+function! s:LspKeymaps()
+    " navigation
+    nnoremap <buffer> gd          :LspGotoDefinition<CR>
+    nnoremap <buffer> gD          :LspGotoDeclaration<CR>
+    nnoremap <buffer> gr          :LspShowReferences<CR>
+    nnoremap <buffer> gi          :LspGotoImpl<CR>
+    nnoremap <buffer> gy          :LspGotoTypeDef<CR>
+    " info
+    nnoremap <buffer> K           :LspHover<CR>
+    nnoremap <buffer> <leader>ls  :LspSymbolSearch<CR>
+    nnoremap <buffer> <leader>lS  :LspWorkspaceSymbol<CR>
+    " diagnostics
+    nnoremap <buffer> [d          :LspDiagPrev<CR>
+    nnoremap <buffer> ]d          :LspDiagNext<CR>
+    nnoremap <buffer> <leader>ld  :LspDiagShow<CR>
+    nnoremap <buffer> <leader>lq  :LspDiagCurrent<CR>
+    " actions
+    nnoremap <buffer> <leader>rn  :LspRename<CR>
+    nnoremap <buffer> <leader>ca  :LspCodeAction<CR>
+    nnoremap <buffer> <leader>lf  :LspFormat<CR>
+    vnoremap <buffer> <leader>lf  :LspFormat<CR>
+    " call hierarchy
+    nnoremap <buffer> <leader>lc  :LspCallHierarchy<CR>
+endfunction
+
+" ============================================================
+" GIT (fugitive + gitgutter)
+" ============================================================
+nnoremap <leader>gs  :Git<CR>
+nnoremap <leader>gb  :Git blame<CR>
+nnoremap <leader>gd  :Gdiffsplit<CR>
+nnoremap <leader>gl  :Gclog<CR>
+nnoremap <leader>gp  :Git push<CR>
+nnoremap <leader>gP  :Git pull<CR>
+
+" hunk navigation
+nnoremap [h :GitGutterPrevHunk<CR>
+nnoremap ]h :GitGutterNextHunk<CR>
+nnoremap <leader>hs  :GitGutterStageHunk<CR>
+nnoremap <leader>hu  :GitGutterUndoHunk<CR>
+nnoremap <leader>hp  :GitGutterPreviewHunk<CR>
+
+let g:gitgutter_sign_added    = '▎'
+let g:gitgutter_sign_modified = '▎'
+let g:gitgutter_sign_removed  = '▂'
+
+" ============================================================
+" NETRW (via vim-vinegar)
+" ============================================================
+let g:netrw_banner    = 0       " no banner
+let g:netrw_liststyle = 3       " tree view by default
+let g:netrw_winsize   = 25
+
+" ============================================================
+" DOCKER COMPOSE — filetype detection
+" ============================================================
+augroup DockerCompose
+    au!
+    au BufRead,BufNewFile docker-compose*.yml,docker-compose*.yaml,compose*.yml,compose*.yaml
+        \ set filetype=yaml.docker-compose
+augroup END
+
+" ============================================================
+" MARKDOWN — glow preview
+" ============================================================
+let s:glow_buf = -1
+
+function! s:GlowPreview()
+    let l:src_win = winnr()
+    let l:file = expand('%:p')
+
+    " Close existing glow window
+    if s:glow_buf != -1 && bufexists(s:glow_buf)
+        let l:glow_win = bufwinnr(s:glow_buf)
+        if l:glow_win != -1
+            execute l:glow_win . 'wincmd w'
+            close!
+        else
+            execute 'bdelete! ' . s:glow_buf
+        endif
+    endif
+
+    " Pass args as list — avoids shell quoting issues with term_start
+    let l:job = term_start(
+        \ ['glow', '--width', '78', '-s', 'dark', l:file],
+        \ {'vertical': 1, 'term_name': 'glow: ' . expand('%:t')})
+    let s:glow_buf = bufnr(l:job)
+    execute l:src_win . 'wincmd w'
+endfunction
+
+nnoremap <leader>mg :call <SID>GlowPreview()<CR>
+
+" Auto-refresh on save if glow is already open
+augroup MarkdownGlow
+    au!
+    au BufWritePost *.md,*.markdown
+        \ if s:glow_buf != -1 && bufexists(s:glow_buf) |
+        \     call s:GlowPreview() |
+        \ endif
+augroup END
+
+" ============================================================
+" UNDO DIRECTORY
+" ============================================================
+if !isdirectory(expand('~/.vim/undo'))
+    call mkdir(expand('~/.vim/undo'), 'p')
+endif

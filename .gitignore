@@ -1,0 +1,6 @@
+# Vim — fichiers générés, ne pas versionner
+vim/plugged/
+vim/undo/
+vim/autoload/
+*.swp
+*.swo
