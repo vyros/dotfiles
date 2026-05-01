@@ -10,19 +10,19 @@
 NAME="monitor"
 
 _build_layout() {
-    local t="$1"
-    tmux send-keys      -t "${t}.0" "btop" Enter
-    tmux split-window -h -t "${t}.0" -p 40
-    tmux send-keys      -t "${t}.1" "journalctl -f" Enter
-    tmux split-window -v -t "${t}.1" -p 50
-    tmux send-keys      -t "${t}.2" "watch -n2 'dmesg | tail -20'" Enter
-    tmux select-pane    -t "${t}.0"
+    local p0="$1"
+    tmux send-keys -t "$p0" "btop" Enter
+    local p1; p1=$(tmux split-window -h -t "$p0" -p 40 -P -F '#{pane_id}')
+    tmux send-keys -t "$p1" "journalctl -f" Enter
+    local p2; p2=$(tmux split-window -v -t "$p1" -p 50 -P -F '#{pane_id}')
+    tmux send-keys -t "$p2" "watch -n2 'dmesg | tail -20'" Enter
+    tmux select-pane -t "$p0"
 }
 
 if [[ "${MUX_WINDOW:-0}" == "1" ]]; then
     # ── Nouvelle fenêtre dans la session courante ─────────────────────────────
-    W=$(tmux new-window -P -F '#{window_id}' -n "$NAME")
-    _build_layout "$W"
+    p0=$(tmux new-window -P -F '#{pane_id}' -n "$NAME")
+    _build_layout "$p0"
 else
     # ── Nouvelle session ──────────────────────────────────────────────────────
     if tmux has-session -t "$NAME" 2>/dev/null; then
@@ -31,7 +31,8 @@ else
         exit 0
     fi
     tmux new-session -d -s "$NAME"
-    _build_layout "$NAME:0"
+    p0=$(tmux display-message -t "$NAME" -p '#{pane_id}')
+    _build_layout "$p0"
     [[ -z "$TMUX" ]] && tmux attach-session -t "$NAME" \
                      || tmux switch-client  -t "$NAME"
 fi
