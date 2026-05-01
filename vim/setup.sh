@@ -57,7 +57,8 @@ if [[ $PM == arch ]]; then
         clang                          `# clangd` \
         rustup \
         fzf git-delta zoxide ruff lazygit bat fd \
-        jq direnv eza btop
+        jq direnv eza btop \
+        ttf-jetbrains-mono-nerd
 
 elif [[ $PM == debian ]]; then
     sudo apt-get update -qq
@@ -112,6 +113,26 @@ elif [[ $PM == debian ]]; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
         export PATH="$HOME/.cargo/bin:$PATH"
     fi
+
+    # JetBrains Mono Nerd Font
+    if ! fc-list | grep -qi "JetBrainsMono Nerd"; then
+        info "Installation de JetBrainsMono Nerd Font..."
+        _font_url=$(curl -s "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" \
+            | grep "browser_download_url" | grep "JetBrainsMono.tar.xz" | head -1 | cut -d'"' -f4)
+        if [[ -n $_font_url ]]; then
+            mkdir -p "$HOME/.local/share/fonts/JetBrainsMono"
+            curl -sLo /tmp/_JetBrainsMono.tar.xz "$_font_url"
+            tar -xf /tmp/_JetBrainsMono.tar.xz -C "$HOME/.local/share/fonts/JetBrainsMono" '*.ttf' 2>/dev/null \
+                || tar -xf /tmp/_JetBrainsMono.tar.xz -C "$HOME/.local/share/fonts/JetBrainsMono"
+            rm /tmp/_JetBrainsMono.tar.xz
+            fc-cache -f "$HOME/.local/share/fonts"
+            info "JetBrainsMono Nerd Font installée"
+        else
+            warning "Impossible de récupérer l'URL de JetBrainsMono Nerd Font"
+        fi
+    else
+        info "JetBrainsMono Nerd Font déjà installée"
+    fi
 fi
 
 # ── rust-analyzer ─────────────────────────────────────────────────────────────
@@ -155,3 +176,4 @@ else
 fi
 
 info "Terminé. Lance vim pour vérifier."
+info "Police : configure ton terminal pour utiliser 'JetBrainsMono Nerd Font' afin d'activer les icônes."
