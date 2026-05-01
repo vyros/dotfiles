@@ -49,14 +49,25 @@ tmux source ~/.tmux.conf
 | Raccourci | Action |
 |---|---|
 | `C-a $` | Renommer la session |
-| `C-a s` | Lister et switcher de session |
-| `C-a d` | Se détacher de la session (la session reste active en arrière-plan) |
+| `C-a s` | Lister et switcher de session (navigation `hjkl`, `x` pour tuer) |
+| `C-a d` | Se détacher de la session (reste active en arrière-plan) |
 | `C-a C-s` | Sauvegarder la session (tmux-resurrect) |
 | `C-a C-r` | Restaurer la session (tmux-resurrect) |
 
-Fermer une session depuis le prompt tmux (`C-a :`) :
+Depuis le shell (hors tmux) :
+
+```bash
+tmux ls                   # lister les sessions actives
+tmux a                    # se rattacher à la dernière session détachée
+tmux a -t <nom>           # se rattacher à une session spécifique
+```
+
+Fermer une session :
 
 ```
+# Depuis C-a s : naviguer jusqu'à la session, appuyer sur x (confirmation demandée)
+
+# Depuis le prompt tmux (C-a :) :
 kill-session              # ferme la session courante
 kill-session -t <nom>     # ferme une session spécifique
 ```
