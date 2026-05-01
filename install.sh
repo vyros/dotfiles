@@ -37,6 +37,10 @@ if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
     git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 fi
 
+# ── Git ───────────────────────────────────────────────────────────────────────
+info "Configuration git..."
+git config --global include.path "$DOTFILES/git/gitconfig"
+
 # ── Dépendances + plugins ─────────────────────────────────────────────────────
 read -rp "[?] Installer les dépendances et les plugins ? [o/N] " answer
 if [[ ${answer,,} == "o" ]]; then
