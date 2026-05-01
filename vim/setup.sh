@@ -58,7 +58,7 @@ if [[ $PM == arch ]]; then
         rustup \
         fzf git-delta zoxide ruff lazygit bat fd \
         jq direnv eza btop \
-        ttf-jetbrains-mono-nerd
+        ttf-hack-nerd
 
 elif [[ $PM == debian ]]; then
     sudo apt-get update -qq
@@ -114,24 +114,24 @@ elif [[ $PM == debian ]]; then
         export PATH="$HOME/.cargo/bin:$PATH"
     fi
 
-    # JetBrains Mono Nerd Font
-    if ! fc-list | grep -qi "JetBrainsMono Nerd"; then
-        info "Installation de JetBrainsMono Nerd Font..."
+    # Hack Nerd Font
+    if ! fc-list | grep -qi "Hack Nerd"; then
+        info "Installation de Hack Nerd Font..."
         _font_url=$(curl -s "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" \
-            | grep "browser_download_url" | grep "JetBrainsMono.tar.xz" | head -1 | cut -d'"' -f4)
+            | grep "browser_download_url" | grep "Hack.tar.xz" | head -1 | cut -d'"' -f4)
         if [[ -n $_font_url ]]; then
-            mkdir -p "$HOME/.local/share/fonts/JetBrainsMono"
-            curl -sLo /tmp/_JetBrainsMono.tar.xz "$_font_url"
-            tar -xf /tmp/_JetBrainsMono.tar.xz -C "$HOME/.local/share/fonts/JetBrainsMono" '*.ttf' 2>/dev/null \
-                || tar -xf /tmp/_JetBrainsMono.tar.xz -C "$HOME/.local/share/fonts/JetBrainsMono"
-            rm /tmp/_JetBrainsMono.tar.xz
+            mkdir -p "$HOME/.local/share/fonts/HackNerd"
+            curl -sLo /tmp/_HackNerd.tar.xz "$_font_url"
+            tar -xf /tmp/_HackNerd.tar.xz -C "$HOME/.local/share/fonts/HackNerd" '*.ttf' 2>/dev/null \
+                || tar -xf /tmp/_HackNerd.tar.xz -C "$HOME/.local/share/fonts/HackNerd"
+            rm /tmp/_HackNerd.tar.xz
             fc-cache -f "$HOME/.local/share/fonts"
-            info "JetBrainsMono Nerd Font installée"
+            info "Hack Nerd Font installée"
         else
-            warning "Impossible de récupérer l'URL de JetBrainsMono Nerd Font"
+            warning "Impossible de récupérer l'URL de Hack Nerd Font"
         fi
     else
-        info "JetBrainsMono Nerd Font déjà installée"
+        info "Hack Nerd Font déjà installée"
     fi
 fi
 
@@ -176,4 +176,4 @@ else
 fi
 
 info "Terminé. Lance vim pour vérifier."
-info "Police : configure ton terminal pour utiliser 'JetBrainsMono Nerd Font' afin d'activer les icônes."
+info "Police : configure ton terminal pour utiliser 'Hack Nerd Font' afin d'activer les icônes."
