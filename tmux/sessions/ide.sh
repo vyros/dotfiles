@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
-# Layout IDE : vim (gauche) | btop (haut droite) | lazygit (bas droite)
+# Layout IDE : btop (haut gauche) | lazygit (bas gauche) | vim (droite)
 #
-# +---------------------------+------------------+
-# |                           |      btop        |
-# |           vim             +------------------+
-# |                           |    lazygit       |
-# +---------------------------+------------------+
+# +------------------+---------------------------+
+# |      btop        |                           |
+# +------------------+           vim             |
+# |    lazygit       |                           |
+# +------------------+---------------------------+
 
 NAME="ide"
 
 _build_layout() {
     local p0="$1"
-    tmux send-keys -t "$p0" "vim" Enter
-    local p1; p1=$(tmux split-window -h -t "$p0" -p 40 -P -F '#{pane_id}')
-    tmux send-keys -t "$p1" "btop" Enter
-    local p2; p2=$(tmux split-window -v -t "$p1" -p 50 -P -F '#{pane_id}')
+    tmux send-keys -t "$p0" "btop" Enter
+    local p1; p1=$(tmux split-window -h -t "$p0" -p 60 -P -F '#{pane_id}')
+    tmux send-keys -t "$p1" "vim" Enter
+    local p2; p2=$(tmux split-window -v -t "$p0" -p 50 -P -F '#{pane_id}')
     tmux send-keys -t "$p2" "lazygit" Enter
-    tmux select-pane -t "$p0"
+    tmux select-pane -t "$p1"
 }
 
 if [[ "${MUX_WINDOW:-0}" == "1" ]]; then
