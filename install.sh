@@ -8,6 +8,7 @@ DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 info()    { echo "[+] $*"; }
 warning() { echo "[!] $*"; }
+header()  { echo; echo "── $* ──────────────────────────────────────────"; }
 
 symlink() {
     local src="$1" dst="$2"
@@ -19,32 +20,79 @@ symlink() {
     info "$dst → $src"
 }
 
+# Demande o/n, retourne 0 si oui
+ask() {
+    local prompt="$1" default="${2:-o}"
+    local hint; [[ $default == o ]] && hint="[O/n]" || hint="[o/N]"
+    read -rp "    $prompt $hint " answer
+    answer="${answer:-$default}"
+    [[ ${answer,,} == o ]]
+}
+
+# ── Menu de sélection ─────────────────────────────────────────────────────────
+header "Dotfiles — sélection des composants"
+echo
+do_vim=false
+do_tmux=false
+do_git=false
+do_deps=false
+
+ask "Vim"          && do_vim=true  || true
+ask "tmux"         && do_tmux=true || true
+ask "Git"          && do_git=true  || true
+ask "Dépendances (LSP, plugins vim/tmux)" n && do_deps=true || true
+
+# ── Résumé ────────────────────────────────────────────────────────────────────
+echo
+echo "  Composants sélectionnés :"
+$do_vim  && echo "    • Vim"  || true
+$do_tmux && echo "    • tmux" || true
+$do_git  && echo "    • Git"  || true
+$do_deps && echo "    • Dépendances" || true
+echo
+
+if ! $do_vim && ! $do_tmux && ! $do_git && ! $do_deps; then
+    info "Rien à installer."
+    exit 0
+fi
+
+ask "Confirmer l'installation ?" || exit 0
+
 # ── Vim ───────────────────────────────────────────────────────────────────────
-info "Configuration Vim..."
-mkdir -p "$HOME/.vim"
-symlink "$DOTFILES/vim/vimrc"     "$HOME/.vimrc"
-symlink "$DOTFILES/vim/setup.sh"  "$HOME/.vim/setup.sh"
-symlink "$DOTFILES/vim/README.md" "$HOME/.vim/README.md"
+if $do_vim; then
+    header "Vim"
+    mkdir -p "$HOME/.vim"
+    symlink "$DOTFILES/vim/vimrc"     "$HOME/.vimrc"
+    symlink "$DOTFILES/vim/setup.sh"  "$HOME/.vim/setup.sh"
+    symlink "$DOTFILES/vim/README.md" "$HOME/.vim/README.md"
+fi
 
 # ── tmux ──────────────────────────────────────────────────────────────────────
-info "Configuration tmux..."
-symlink "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
-symlink "$DOTFILES/tmux/README.md" "$HOME/.tmux-README.md"
-
-# TPM (Tmux Plugin Manager)
-if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
-    info "Bootstrap de TPM..."
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+if $do_tmux; then
+    header "tmux"
+    symlink "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
+    symlink "$DOTFILES/tmux/README.md" "$HOME/.tmux-README.md"
+    if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+        info "Bootstrap de TPM..."
+        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    fi
 fi
 
 # ── Git ───────────────────────────────────────────────────────────────────────
-info "Configuration git..."
-git config --global include.path "$DOTFILES/git/gitconfig"
+if $do_git; then
+    header "Git"
+    git config --global include.path "$DOTFILES/git/gitconfig"
+    info "~/.gitconfig ← include $DOTFILES/git/gitconfig"
+fi
 
-# ── Dépendances + plugins ─────────────────────────────────────────────────────
-read -rp "[?] Installer les dépendances et les plugins ? [o/N] " answer
-if [[ ${answer,,} == "o" ]]; then
+# ── Dépendances ───────────────────────────────────────────────────────────────
+if $do_deps; then
+    header "Dépendances"
     bash "$DOTFILES/vim/setup.sh"
 fi
 
-info "Terminé. Dans tmux, appuie sur C-a I pour installer les plugins tmux."
+# ── Fin ───────────────────────────────────────────────────────────────────────
+echo
+info "Terminé."
+$do_tmux && info "Dans tmux : C-a I pour installer les plugins." || true
+$do_vim  && info "Dans vim  : :PlugInstall si les plugins ne sont pas installés." || true
