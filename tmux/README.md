@@ -91,16 +91,15 @@ kill-session -t <nom>     # ferme une session spécifique
 ```bash
 mux              # lister les layouts disponibles
 mux ide          # auto : fenêtre si dans tmux, session sinon
-mux ide -w       # forcer une nouvelle fenêtre (session courante)
-mux ide -s       # forcer une nouvelle session
-mux monitor -w   # layout monitor dans une nouvelle fenêtre
+mux monitor      # idem pour le layout monitor
 ```
 
 Ou depuis le prompt tmux (`C-a :`) :
 
 ```
-ide              # ouvre le layout ide dans une nouvelle fenêtre
-monitor          # ouvre le layout monitor dans une nouvelle fenêtre
+mux ide          # ouvre le layout ide dans une nouvelle fenêtre
+mux monitor      # ouvre le layout monitor dans une nouvelle fenêtre
+mux              # affiche les layouts disponibles
 ```
 
 **Auto-détection** : `mux` détecte si tmux est actif.
@@ -109,12 +108,9 @@ monitor          # ouvre le layout monitor dans une nouvelle fenêtre
 
 Si une session du même nom existe déjà, `mux` s'y reconnecte.
 
-### Ajouter un layout et son alias tmux
+### Ajouter un layout
 
-Ajouter dans `tmux/tmux.conf` :
-```
-set -ga command-alias '<nom>=run-shell "MUX_WINDOW=1 bash $HOME/.config/tmux/sessions/<nom>.sh"'
-```
+Il suffit de créer un fichier dans `tmux/sessions/` — aucune modification de `tmux.conf` n'est nécessaire.
 
 ### Créer le script
 
