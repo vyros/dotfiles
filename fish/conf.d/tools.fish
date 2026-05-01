@@ -43,6 +43,24 @@ if type -q uv
     abbr -a pipi 'uv pip install'
 end
 
+# ── Docker ───────────────────────────────────────────────────────────────────
+if type -q docker
+    abbr -a dps    'docker ps'
+    abbr -a dpsa   'docker ps -a'
+    abbr -a dimg   'docker images'
+    abbr -a dex    'docker exec -it'
+    abbr -a dlf    'docker logs -f'
+    abbr -a dprune 'docker system prune -f'
+    abbr -a dcu    'docker compose up -d'
+    abbr -a dcd    'docker compose down'
+    abbr -a dcl    'docker compose logs -f'
+    abbr -a dcr    'docker compose restart'
+end
+
+if type -q lazydocker
+    abbr -a lzd lazydocker
+end
+
 # ── mux (layouts tmux prédéfinis) ────────────────────────────────────────────
 function mux --description "Lance un layout tmux prédéfini"
     set sessions_dir "$HOME/.config/tmux/sessions"

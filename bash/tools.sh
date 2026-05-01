@@ -45,6 +45,24 @@ if command -v uv &>/dev/null; then
     alias pipi='uv pip install'
 fi
 
+# ── Docker ───────────────────────────────────────────────────────────────────
+if command -v docker &>/dev/null; then
+    alias dps='docker ps'
+    alias dpsa='docker ps -a'
+    alias dimg='docker images'
+    alias dex='docker exec -it'
+    alias dlf='docker logs -f'
+    alias dprune='docker system prune -f'
+    alias dcu='docker compose up -d'
+    alias dcd='docker compose down'
+    alias dcl='docker compose logs -f'
+    alias dcr='docker compose restart'
+fi
+
+if command -v lazydocker &>/dev/null; then
+    alias lzd='lazydocker'
+fi
+
 # ── mux (layouts tmux prédéfinis) ────────────────────────────────────────────
 mux() {
     local sessions_dir="$HOME/.config/tmux/sessions"

@@ -135,6 +135,9 @@ elif [[ $PM == debian ]]; then
     fi
 fi
 
+# ── lazydocker (TUI Docker — non disponible dans les dépôts officiels) ───────
+github_install "jesseduffield/lazydocker" "Linux_x86_64.tar.gz" "lazydocker" bin
+
 # ── rust-analyzer ─────────────────────────────────────────────────────────────
 if command -v rustup &>/dev/null; then
     info "Installation de rust-analyzer..."
