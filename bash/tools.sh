@@ -45,6 +45,26 @@ if command -v uv &>/dev/null; then
     alias pipi='uv pip install'
 fi
 
+# ── Kubernetes ───────────────────────────────────────────────────────────────
+if command -v kubectl &>/dev/null; then
+    source <(kubectl completion bash)
+    alias k='kubectl'
+    alias kgp='kubectl get pods'
+    alias kgpa='kubectl get pods -A'
+    alias kgs='kubectl get svc'
+    alias kgd='kubectl get deploy'
+    alias kgn='kubectl get nodes'
+    alias kl='kubectl logs -f'
+    alias kex='kubectl exec -it'
+    alias kaf='kubectl apply -f'
+    alias kdf='kubectl delete -f'
+    alias kdp='kubectl describe pod'
+fi
+
+command -v kubectx &>/dev/null && alias kctx='kubectx'
+command -v kubens  &>/dev/null && alias kns='kubens'
+command -v stern   &>/dev/null && alias st='stern'
+
 # ── Docker ───────────────────────────────────────────────────────────────────
 if command -v docker &>/dev/null; then
     alias dps='docker ps'

@@ -9,7 +9,7 @@ Configuration personnelle pour un environnement de développement en ligne de co
 | [Vim](vim/README.md) | Configuration IDE (LSP, fzf, bat preview, git, glow) |
 | [tmux](tmux/README.md) | Multiplexeur de terminal (Gruvbox, sessions persistantes) |
 | [Git](git/README.md) | Aliases et paramètres (delta pour les diffs) |
-| Fish / Bash | Intégration zoxide, fzf, eza, lazygit, uv, Docker |
+| Fish / Bash | Intégration zoxide, fzf, eza, lazygit, uv, Docker, Kubernetes |
 | Bat | Thème Gruvbox, pager pour man |
 
 ## Outils inclus
@@ -29,6 +29,9 @@ Configuration personnelle pour un environnement de développement en ligne de co
 | `direnv` | Variables d'environnement par répertoire |
 | `btop` | Moniteur système |
 | `lazydocker` | TUI Docker interactif (containers, images, logs, stats) |
+| `k9s` | TUI Kubernetes interactif (pods, services, logs, exec) |
+| `kubectx` / `kubens` | Basculer entre contextes et namespaces K8s |
+| `stern` | Tail de logs multi-pods en parallèle |
 
 ## Installation
 
@@ -89,6 +92,7 @@ C-a I
 Le script `vim/setup.sh` installe automatiquement les dépendances sur **Arch Linux** et **Debian 12+** :
 
 - Outils : `ripgrep`, `glow`, `fzf`, `fd`, `bat`, `delta`, `zoxide`, `lazygit`, `lazydocker`, `eza`, `jq`, `direnv`, `btop`
+- Kubernetes : `kubectl`, `k9s`, `kubectx`, `kubens`, `stern`
 - Runtime : `nodejs`, `npm`, `pipx`, `rustup`
 - Compilateurs : `clangd`, `rust-analyzer`
 - Serveurs LSP Python : `pylsp`, `pyright`

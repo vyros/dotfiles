@@ -43,6 +43,26 @@ if type -q uv
     abbr -a pipi 'uv pip install'
 end
 
+# ── Kubernetes ───────────────────────────────────────────────────────────────
+if type -q kubectl
+    kubectl completion fish | source
+    abbr -a k     kubectl
+    abbr -a kgp   'kubectl get pods'
+    abbr -a kgpa  'kubectl get pods -A'
+    abbr -a kgs   'kubectl get svc'
+    abbr -a kgd   'kubectl get deploy'
+    abbr -a kgn   'kubectl get nodes'
+    abbr -a kl    'kubectl logs -f'
+    abbr -a kex   'kubectl exec -it'
+    abbr -a kaf   'kubectl apply -f'
+    abbr -a kdf   'kubectl delete -f'
+    abbr -a kdp   'kubectl describe pod'
+end
+
+if type -q kubectx; abbr -a kctx kubectx; end
+if type -q kubens;  abbr -a kns  kubens;  end
+if type -q stern;   abbr -a st   stern;   end
+
 # ── Docker ───────────────────────────────────────────────────────────────────
 if type -q docker
     abbr -a dps    'docker ps'

@@ -158,6 +158,7 @@ tmux select-pane -t "$SESSION:0.0"
 | `ide` | vim (droite) · btop (haut gauche) · lazygit (bas gauche) |
 | `monitor` | btop (gauche) · journalctl -f (haut droite) · dmesg (bas droite) |
 | `compose` | lazydocker (gauche) · shell (droite) |
+| `k8s` | k9s (gauche) · shell (droite) |
 
 ---
 

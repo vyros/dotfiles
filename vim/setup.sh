@@ -58,7 +58,11 @@ if [[ $PM == arch ]]; then
         rustup \
         fzf git-delta zoxide ruff lazygit bat fd \
         jq direnv eza btop \
-        ttf-hack-nerd
+        ttf-hack-nerd \
+        kubectl k9s kubectx
+
+    # stern non disponible dans les dépôts officiels
+    github_install "stern/stern" "stern_linux_amd64" "stern" bin
 
 elif [[ $PM == debian ]]; then
     sudo apt-get update -qq
@@ -101,6 +105,19 @@ elif [[ $PM == debian ]]; then
 
     # lazygit
     github_install "jesseduffield/lazygit" "Linux_x86_64.tar.gz" "lazygit" bin
+
+    # Kubernetes
+    if ! command -v kubectl &>/dev/null; then
+        info "Installation de kubectl..."
+        _kube_ver=$(curl -sL https://dl.k8s.io/release/stable.txt)
+        curl -sLo /tmp/kubectl "https://dl.k8s.io/release/${_kube_ver}/bin/linux/amd64/kubectl"
+        install -m755 /tmp/kubectl "$HOME/.local/bin/kubectl"
+        rm /tmp/kubectl
+    fi
+    github_install "derailed/k9s"    "k9s_Linux_amd64.tar.gz" "k9s"      bin
+    github_install "ahmetb/kubectx"  "kubectx_v"              "kubectx"  bin
+    github_install "ahmetb/kubectx"  "kubens_v"               "kubens"   bin
+    github_install "stern/stern"     "stern_linux_amd64"      "stern"    bin
 
     # ruff (via pipx, disponible partout)
     if ! command -v ruff &>/dev/null; then
