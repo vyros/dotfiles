@@ -20,10 +20,10 @@ fi
 # Debian installe 'batcat', les autres distros 'bat'
 if command -v bat &>/dev/null; then
     export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-    export MANROFF_OPT="-c"
+    export GROFF_NO_SGR=1
 elif command -v batcat &>/dev/null; then
     export MANPAGER="sh -c 'col -bx | batcat -l man -p'"
-    export MANROFF_OPT="-c"
+    export GROFF_NO_SGR=1
 fi
 
 # ── eza (ls amélioré) ─────────────────────────────────────────────────────────

@@ -18,10 +18,10 @@ end
 # Debian installe 'batcat', les autres distros 'bat'
 if type -q bat
     set -gx MANPAGER "sh -c 'col -bx | bat -l man -p'"
-    set -gx MANROFF_OPT "-c"
+    set -gx GROFF_NO_SGR 1
 else if type -q batcat
     set -gx MANPAGER "sh -c 'col -bx | batcat -l man -p'"
-    set -gx MANROFF_OPT "-c"
+    set -gx GROFF_NO_SGR 1
 end
 
 # ── eza (ls amélioré) ─────────────────────────────────────────────────────────
