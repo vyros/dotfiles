@@ -42,3 +42,26 @@ if type -q uv
     abbr -a venv 'uv venv'
     abbr -a pipi 'uv pip install'
 end
+
+# ── mux (layouts tmux prédéfinis) ────────────────────────────────────────────
+function mux --description "Lance un layout tmux prédéfini"
+    set sessions_dir "$HOME/.config/tmux/sessions"
+    if test (count $argv) -eq 0
+        if test -d "$sessions_dir"
+            echo "Layouts disponibles :"
+            for f in $sessions_dir/*.sh
+                echo "  mux "(basename $f .sh)
+            end
+        else
+            echo "Aucun layout trouvé dans $sessions_dir"
+        end
+        return 0
+    end
+    set script "$sessions_dir/$argv[1].sh"
+    if not test -f "$script"
+        echo "Layout '$argv[1]' introuvable." >&2
+        mux
+        return 1
+    end
+    bash "$script"
+end

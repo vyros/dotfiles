@@ -80,6 +80,8 @@ if $do_tmux; then
     header "tmux"
     symlink "$DOTFILES/tmux/tmux.conf" "$HOME/.tmux.conf"
     symlink "$DOTFILES/tmux/README.md" "$HOME/.tmux-README.md"
+    mkdir -p "$HOME/.config/tmux"
+    symlink "$DOTFILES/tmux/sessions"  "$HOME/.config/tmux/sessions"
     if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
         info "Bootstrap de TPM..."
         git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"

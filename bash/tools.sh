@@ -44,3 +44,26 @@ if command -v uv &>/dev/null; then
     alias venv='uv venv'
     alias pipi='uv pip install'
 fi
+
+# ── mux (layouts tmux prédéfinis) ────────────────────────────────────────────
+mux() {
+    local sessions_dir="$HOME/.config/tmux/sessions"
+    if [[ -z "${1:-}" ]]; then
+        if compgen -G "$sessions_dir/*.sh" &>/dev/null; then
+            echo "Layouts disponibles :"
+            for f in "$sessions_dir"/*.sh; do
+                echo "  mux $(basename "$f" .sh)"
+            done
+        else
+            echo "Aucun layout trouvé dans $sessions_dir"
+        fi
+        return 0
+    fi
+    local script="$sessions_dir/$1.sh"
+    if [[ ! -f "$script" ]]; then
+        echo "Layout '$1' introuvable." >&2
+        mux
+        return 1
+    fi
+    bash "$script"
+}

@@ -76,6 +76,54 @@ tmux source ~/.tmux.conf
 
 ---
 
+## Layouts prédéfinis — `mux`
+
+```bash
+mux           # lister les layouts disponibles
+mux ide       # vim + btop + lazygit
+mux monitor   # btop + journalctl + dmesg
+```
+
+Les layouts sont des scripts dans `~/.config/tmux/sessions/`. Si la session existe
+déjà, `mux` s'y reconnecte au lieu d'en créer une nouvelle.
+
+### Ajouter un layout
+
+Créer un fichier `tmux/sessions/<nom>.sh` dans le repo dotfiles :
+
+```bash
+#!/usr/bin/env bash
+SESSION="mon-layout"
+
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    [[ -z "$TMUX" ]] && tmux attach-session -t "$SESSION" \
+                     || tmux switch-client  -t "$SESSION"
+    exit 0
+fi
+
+tmux new-session -d -s "$SESSION"
+
+# Pane 0 — commande principale
+tmux send-keys -t "$SESSION:0.0" "ma-commande" Enter
+
+# Pane 1 — split vertical droite (40%)
+tmux split-window -h -t "$SESSION:0.0" -p 40
+tmux send-keys -t "$SESSION:0.1" "autre-commande" Enter
+
+tmux select-pane -t "$SESSION:0.0"
+[[ -z "$TMUX" ]] && tmux attach-session -t "$SESSION" \
+                 || tmux switch-client  -t "$SESSION"
+```
+
+### Layouts inclus
+
+| Layout | Contenu |
+|---|---|
+| `ide` | vim (gauche) · btop (haut droite) · lazygit (bas droite) |
+| `monitor` | btop (gauche) · journalctl -f (haut droite) · dmesg (bas droite) |
+
+---
+
 ## Plugins
 
 | Plugin | Rôle |
