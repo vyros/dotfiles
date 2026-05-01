@@ -93,5 +93,9 @@ function mux --description "Lance un layout tmux prédéfini"
         end
     end
 
-    MUX_WINDOW=(test "$mode" = window; and echo 1; or echo 0) bash "$script"
+    if test "$mode" = window
+        MUX_WINDOW=1 bash "$script"
+    else
+        MUX_WINDOW=0 bash "$script"
+    end
 end
