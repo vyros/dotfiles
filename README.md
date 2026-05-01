@@ -28,6 +28,10 @@ Configuration personnelle pour un environnement de développement en ligne de co
 | `jq` | Processeur JSON |
 | `direnv` | Variables d'environnement par répertoire |
 | `btop` | Moniteur système |
+| `yazi` | TUI file manager avec navigation et prévisualisation (`y` pour cd à la sortie) |
+| `yq` | Processeur YAML (équivalent de jq pour YAML) |
+| `xh` | Client HTTP moderne, alternative à curl/httpie |
+| `dust` | Analyse d'utilisation disque visuelle (`du` moderne) |
 | `lazydocker` | TUI Docker interactif (containers, images, logs, stats) |
 | `k9s` | TUI Kubernetes interactif (pods, services, logs, exec) |
 | `kubectx` / `kubens` | Basculer entre contextes et namespaces K8s |
@@ -91,7 +95,7 @@ C-a I
 
 Le script `vim/setup.sh` installe automatiquement les dépendances sur **Arch Linux** et **Debian 12+** :
 
-- Outils : `ripgrep`, `glow`, `fzf`, `fd`, `bat`, `delta`, `zoxide`, `lazygit`, `lazydocker`, `eza`, `jq`, `direnv`, `btop`
+- Outils : `ripgrep`, `glow`, `fzf`, `fd`, `bat`, `delta`, `zoxide`, `lazygit`, `lazydocker`, `yazi`, `yq`, `xh`, `dust`, `eza`, `jq`, `direnv`, `btop`
 - Kubernetes : `kubectl`, `k9s`, `kubectx`, `kubens`, `stern`
 - Runtime : `nodejs`, `npm`, `pipx`, `rustup`
 - Compilateurs : `clangd`, `rust-analyzer`

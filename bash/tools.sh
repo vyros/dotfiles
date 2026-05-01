@@ -45,6 +45,18 @@ if command -v uv &>/dev/null; then
     alias pipi='uv pip install'
 fi
 
+# ── yazi (file manager — y pour changer de répertoire à la sortie) ───────────
+if command -v yazi &>/dev/null; then
+    y() {
+        local tmp=$(mktemp -t "yazi-cwd.XXXXX")
+        yazi "$@" --cwd-file="$tmp"
+        if cwd=$(cat -- "$tmp") && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+            cd -- "$cwd"
+        fi
+        rm -f -- "$tmp"
+    }
+fi
+
 # ── Kubernetes ───────────────────────────────────────────────────────────────
 if command -v kubectl &>/dev/null; then
     source <(kubectl completion bash)

@@ -37,14 +37,17 @@ github_install() {
         curl -sLo /tmp/_pkg.deb "$url"
         sudo dpkg -i /tmp/_pkg.deb
         rm /tmp/_pkg.deb
+    elif [[ $kind == raw ]]; then
+        curl -sLo "$HOME/.local/bin/$binary" "$url"
+        chmod +x "$HOME/.local/bin/$binary"
     else
-        # binaire dans une archive tar.gz
-        curl -sLo /tmp/_pkg.tar.gz "$url"
-        tar -xzf /tmp/_pkg.tar.gz -C /tmp "$binary" 2>/dev/null \
-            || tar -xzf /tmp/_pkg.tar.gz -C /tmp --wildcards "*/$binary" 2>/dev/null \
-            || tar -xzf /tmp/_pkg.tar.gz -C /tmp
+        # binaire dans une archive (tar.gz, tar.xz, tar.zst…)
+        curl -sLo /tmp/_pkg.tar "$url"
+        tar -xf /tmp/_pkg.tar -C /tmp "$binary" 2>/dev/null \
+            || tar -xf /tmp/_pkg.tar -C /tmp --wildcards "*/$binary" 2>/dev/null \
+            || tar -xf /tmp/_pkg.tar -C /tmp
         install -m755 /tmp/"$binary" "$HOME/.local/bin/$binary"
-        rm -f /tmp/_pkg.tar.gz /tmp/"$binary"
+        rm -f /tmp/_pkg.tar /tmp/"$binary"
     fi
 }
 
@@ -59,7 +62,8 @@ if [[ $PM == arch ]]; then
         fzf git-delta zoxide ruff lazygit bat fd \
         jq direnv eza btop \
         ttf-hack-nerd \
-        kubectl k9s kubectx
+        kubectl k9s kubectx \
+        go-yq yazi xh dust
 
     # stern non disponible dans les dépôts officiels
     github_install "stern/stern" "stern_linux_amd64" "stern" bin
@@ -117,7 +121,13 @@ elif [[ $PM == debian ]]; then
     github_install "derailed/k9s"    "k9s_Linux_amd64.tar.gz" "k9s"      bin
     github_install "ahmetb/kubectx"  "kubectx_v"              "kubectx"  bin
     github_install "ahmetb/kubectx"  "kubens_v"               "kubens"   bin
-    github_install "stern/stern"     "stern_linux_amd64"      "stern"    bin
+    github_install "stern/stern"      "stern_linux_amd64"           "stern"    bin
+
+    # yq, yazi, xh, dust
+    github_install "mikefarah/yq"    "yq_linux_amd64\""            "yq"       raw
+    github_install "sxyazi/yazi"     "yazi-x86_64-unknown-linux-musl.tar.gz" "yazi" bin
+    github_install "ducaale/xh"      "x86_64-unknown-linux-musl.tar.gz"      "xh"   bin
+    github_install "bootandy/dust"   "x86_64-unknown-linux-musl.tar.gz"      "dust" bin
 
     # ruff (via pipx, disponible partout)
     if ! command -v ruff &>/dev/null; then

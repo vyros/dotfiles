@@ -43,6 +43,18 @@ if type -q uv
     abbr -a pipi 'uv pip install'
 end
 
+# ── yazi (file manager — y pour changer de répertoire à la sortie) ───────────
+if type -q yazi
+    function y --description "yazi avec cd à la sortie"
+        set tmp (mktemp -t "yazi-cwd.XXXXX")
+        yazi $argv --cwd-file="$tmp"
+        if set cwd (cat -- "$tmp"); and test -n "$cwd"; and test "$cwd" != "$PWD"
+            cd -- "$cwd"
+        end
+        rm -f -- "$tmp"
+    end
+end
+
 # ── Kubernetes ───────────────────────────────────────────────────────────────
 if type -q kubectl
     kubectl completion fish | source
