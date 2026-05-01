@@ -167,9 +167,18 @@ tnoremap <Esc> <C-\><C-n>         " exit terminal mode with Esc
 " ============================================================
 let g:fzf_layout = { 'down': '40%' }
 
-" use ripgrep for :Files
-if executable('rg')
+" fd pour lister les fichiers (plus rapide que find)
+if executable('fd')
+    let $FZF_DEFAULT_COMMAND = 'fd --type f --hidden --follow --exclude .git'
+elseif executable('rg')
     let $FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow --glob "!.git"'
+endif
+
+" preview avec bat si disponible
+if executable('bat')
+    let g:fzf_preview_window = ['right:50%', 'ctrl-/']
+    command! -bang -nargs=? -complete=dir Files
+        \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 endif
 
 nnoremap <leader>ff :Files<CR>

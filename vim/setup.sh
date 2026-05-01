@@ -25,13 +25,23 @@ if [[ $PM == arch ]]; then
     sudo pacman -Syu --needed --noconfirm \
         ripgrep glow nodejs npm pipx curl \
         clang                          `# clangd` \
-        rustup
+        rustup \
+        fzf git-delta zoxide ruff lazygit bat fd \
+        jq direnv eza btop
 
 elif [[ $PM == debian ]]; then
     sudo apt-get update -qq
     sudo apt-get install -y --no-install-recommends \
         ripgrep nodejs npm pipx curl \
-        clangd
+        clangd \
+        fzf bat fd-find jq direnv btop
+
+    # eza, delta, zoxide, lazygit — non disponibles dans apt, via GitHub
+    for tool in eza delta zoxide lazygit; do
+        if ! command -v $tool &>/dev/null; then
+            info "$tool non disponible via apt — installer manuellement (voir GitHub)"
+        fi
+    done
 
     # glow — non disponible dans les dépôts Debian, installation via .deb GitHub
     if ! command -v glow &>/dev/null; then

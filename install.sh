@@ -40,6 +40,8 @@ do_deps=false
 ask "Vim"          && do_vim=true  || true
 ask "tmux"         && do_tmux=true || true
 ask "Git"          && do_git=true  || true
+ask "Fish"         && do_fish=true || true
+ask "Bat"          && do_bat=true  || true
 ask "Dépendances (LSP, plugins vim/tmux)" n && do_deps=true || true
 
 # ── Résumé ────────────────────────────────────────────────────────────────────
@@ -48,10 +50,12 @@ echo "  Composants sélectionnés :"
 $do_vim  && echo "    • Vim"  || true
 $do_tmux && echo "    • tmux" || true
 $do_git  && echo "    • Git"  || true
+$do_fish && echo "    • Fish" || true
+$do_bat  && echo "    • Bat"  || true
 $do_deps && echo "    • Dépendances" || true
 echo
 
-if ! $do_vim && ! $do_tmux && ! $do_git && ! $do_deps; then
+if ! $do_vim && ! $do_tmux && ! $do_git && ! $do_fish && ! $do_bat && ! $do_deps; then
     info "Rien à installer."
     exit 0
 fi
@@ -83,6 +87,20 @@ if $do_git; then
     header "Git"
     git config --global include.path "$DOTFILES/git/gitconfig"
     info "~/.gitconfig ← include $DOTFILES/git/gitconfig"
+fi
+
+# ── Fish ──────────────────────────────────────────────────────────────────────
+if $do_fish; then
+    header "Fish"
+    mkdir -p "$HOME/.config/fish/conf.d"
+    symlink "$DOTFILES/fish/conf.d/tools.fish" "$HOME/.config/fish/conf.d/tools.fish"
+fi
+
+# ── Bat ───────────────────────────────────────────────────────────────────────
+if $do_bat; then
+    header "Bat"
+    mkdir -p "$HOME/.config/bat"
+    symlink "$DOTFILES/bat/config" "$HOME/.config/bat/config"
 fi
 
 # ── Dépendances ───────────────────────────────────────────────────────────────

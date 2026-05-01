@@ -6,9 +6,28 @@ Configuration personnelle pour un environnement de développement en ligne de co
 
 | Outil | Description |
 |---|---|
-| [Vim](vim/README.md) | Configuration IDE (LSP, fzf, git, glow) |
+| [Vim](vim/README.md) | Configuration IDE (LSP, fzf, bat preview, git, glow) |
 | [tmux](tmux/README.md) | Multiplexeur de terminal (Gruvbox, sessions persistantes) |
-| [Git](git/README.md) | Aliases et paramètres |
+| [Git](git/README.md) | Aliases et paramètres (delta pour les diffs) |
+| Fish | Intégration zoxide, fzf, eza, lazygit, uv |
+| Bat | Thème Gruvbox, pager pour man |
+
+## Outils inclus
+
+| Outil | Rôle |
+|---|---|
+| `fzf` | Fuzzy finder — fichiers, historique shell, répertoires |
+| `delta` | Pager git avec syntax highlighting |
+| `zoxide` | `cd` intelligent par fréquence (`z projet`) |
+| `uv` | Gestionnaire Python ultra-rapide (pip + venv + pyenv) |
+| `ruff` | Linter/formateur Python |
+| `lazygit` | TUI git interactif |
+| `bat` | `cat` avec syntax highlighting et thème Gruvbox |
+| `eza` | `ls` moderne avec icônes et infos git |
+| `fd` | `find` rapide, utilisé par fzf et Vim |
+| `jq` | Processeur JSON |
+| `direnv` | Variables d'environnement par répertoire |
+| `btop` | Moniteur système |
 
 ## Installation
 
@@ -33,10 +52,12 @@ Le script propose de choisir les composants à installer :
     Vim [O/n]
     tmux [O/n]
     Git [O/n]
+    Fish [O/n]
+    Bat [O/n]
     Dépendances (LSP, plugins vim/tmux) [o/N]
 ```
 
-Les symlinks suivants sont créés :
+Les symlinks créés :
 
 | Symlink | Source |
 |---|---|
@@ -44,6 +65,8 @@ Les symlinks suivants sont créés :
 | `~/.vim/setup.sh` | `dotfiles/vim/setup.sh` |
 | `~/.tmux.conf` | `dotfiles/tmux/tmux.conf` |
 | `~/.gitconfig` | inclut `dotfiles/git/gitconfig` via `[include]` |
+| `~/.config/fish/conf.d/tools.fish` | `dotfiles/fish/conf.d/tools.fish` |
+| `~/.config/bat/config` | `dotfiles/bat/config` |
 
 > **Note :** `~/.gitconfig` n'est pas remplacé — la section `[user]` (nom, email) reste locale à chaque machine.
 
@@ -63,23 +86,30 @@ C-a I
 
 Le script `vim/setup.sh` installe automatiquement les dépendances sur **Arch Linux** et **Debian 12+** :
 
-- `ripgrep`, `glow`, `nodejs`, `npm`, `pipx`
-- `clangd`, `rust-analyzer`
-- Serveurs LSP : `pylsp`, `pyright`, `dockerfile-language-server`, `docker-compose-langserver`
+- Outils : `ripgrep`, `glow`, `fzf`, `fd`, `bat`, `delta`, `zoxide`, `lazygit`, `eza`, `jq`, `direnv`, `btop`
+- Runtime : `nodejs`, `npm`, `pipx`, `rustup`
+- Compilateurs : `clangd`, `rust-analyzer`
+- Serveurs LSP Python : `pylsp`, `pyright`
+- Serveurs LSP Docker : `dockerfile-language-server`, `docker-compose-langserver`
 
 ## Structure
 
 ```
 dotfiles/
-├── install.sh          ← point d'entrée
+├── install.sh                      ← point d'entrée
+├── bat/
+│   └── config                      ← thème Gruvbox
+├── fish/
+│   └── conf.d/
+│       └── tools.fish              ← zoxide, fzf, eza, lazygit, uv
 ├── git/
-│   ├── gitconfig       ← aliases et paramètres git
+│   ├── gitconfig                   ← aliases et delta
 │   └── README.md
 ├── tmux/
 │   ├── tmux.conf
 │   └── README.md
 └── vim/
     ├── vimrc
-    ├── setup.sh        ← installation des dépendances (Arch / Debian)
+    ├── setup.sh                    ← installation des dépendances (Arch / Debian)
     └── README.md
 ```
