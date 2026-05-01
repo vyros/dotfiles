@@ -35,6 +35,8 @@ echo
 do_vim=false
 do_tmux=false
 do_git=false
+do_fish=false
+do_bat=false
 do_deps=false
 
 ask "Vim"          && do_vim=true  || true

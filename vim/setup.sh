@@ -18,6 +18,36 @@ fi
 info()    { echo "[+] $*"; }
 warning() { echo "[!] $*"; }
 
+# Installe un binaire depuis une release GitHub (tar.gz ou .deb)
+# Usage : github_install <owner/repo> <grep_pattern> <binaire> [<deb|bin>]
+github_install() {
+    local repo="$1" pattern="$2" binary="$3" kind="${4:-deb}"
+    if command -v "$binary" &>/dev/null; then
+        info "$binary déjà installé"
+        return
+    fi
+    info "Installation de $binary depuis GitHub ($repo)..."
+    local url
+    url=$(curl -s "https://api.github.com/repos/$repo/releases/latest" \
+        | grep "browser_download_url" | grep "$pattern" | head -1 | cut -d'"' -f4)
+    if [[ -z $url ]]; then
+        warning "$binary : asset introuvable (pattern: $pattern)" ; return
+    fi
+    if [[ $kind == deb ]]; then
+        curl -sLo /tmp/_pkg.deb "$url"
+        sudo dpkg -i /tmp/_pkg.deb
+        rm /tmp/_pkg.deb
+    else
+        # binaire dans une archive tar.gz
+        curl -sLo /tmp/_pkg.tar.gz "$url"
+        tar -xzf /tmp/_pkg.tar.gz -C /tmp "$binary" 2>/dev/null \
+            || tar -xzf /tmp/_pkg.tar.gz -C /tmp --wildcards "*/$binary" 2>/dev/null \
+            || tar -xzf /tmp/_pkg.tar.gz -C /tmp
+        install -m755 /tmp/"$binary" "$HOME/.local/bin/$binary"
+        rm -f /tmp/_pkg.tar.gz /tmp/"$binary"
+    fi
+}
+
 # ── Paquets système ───────────────────────────────────────────────────────────
 info "Installation des paquets système..."
 
@@ -36,26 +66,47 @@ elif [[ $PM == debian ]]; then
         clangd \
         fzf bat fd-find jq direnv btop
 
-    # eza, delta, zoxide, lazygit — non disponibles dans apt, via GitHub
-    for tool in eza delta zoxide lazygit; do
-        if ! command -v $tool &>/dev/null; then
-            info "$tool non disponible via apt — installer manuellement (voir GitHub)"
-        fi
-    done
+    mkdir -p "$HOME/.local/bin"
 
-    # glow — non disponible dans les dépôts Debian, installation via .deb GitHub
-    if ! command -v glow &>/dev/null; then
-        info "Installation de glow depuis GitHub..."
-        GLOW_VER=$(curl -s https://api.github.com/repos/charmbracelet/glow/releases/latest \
-            | grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
-        ARCH=$(dpkg --print-architecture)
-        curl -sLo /tmp/glow.deb \
-            "https://github.com/charmbracelet/glow/releases/latest/download/glow_${GLOW_VER}_${ARCH}.deb"
-        sudo dpkg -i /tmp/glow.deb
-        rm /tmp/glow.deb
+    # bat s'installe comme 'batcat' sur Debian — créer un alias
+    if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+        ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+        info "Symlink bat → batcat créé"
     fi
 
-    # rust-analyzer via rustup
+    # fd-find s'installe comme 'fdfind' sur Debian — créer un alias
+    if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
+        ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+        info "Symlink fd → fdfind créé"
+    fi
+
+    # glow
+    if ! command -v glow &>/dev/null; then
+        ARCH=$(dpkg --print-architecture)
+        github_install "charmbracelet/glow" "linux_${ARCH}.deb" "glow"
+    fi
+
+    # eza
+    github_install "eza-community/eza" "eza_x86_64-unknown-linux-musl" "eza" bin
+
+    # delta
+    github_install "dandavison/delta" "amd64.deb" "delta"
+
+    # zoxide
+    if ! command -v zoxide &>/dev/null; then
+        info "Installation de zoxide..."
+        curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+    fi
+
+    # lazygit
+    github_install "jesseduffield/lazygit" "Linux_x86_64.tar.gz" "lazygit" bin
+
+    # ruff (via pipx, disponible partout)
+    if ! command -v ruff &>/dev/null; then
+        pipx install ruff 2>/dev/null || pipx upgrade ruff
+    fi
+
+    # rustup
     if ! command -v rustup &>/dev/null; then
         info "Installation de rustup..."
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
@@ -67,6 +118,12 @@ fi
 if command -v rustup &>/dev/null; then
     info "Installation de rust-analyzer..."
     rustup component add rust-analyzer 2>/dev/null || true
+fi
+
+# ── uv (Python package manager) ───────────────────────────────────────────────
+if ! command -v uv &>/dev/null; then
+    info "Installation de uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
 # ── LSP via npm ───────────────────────────────────────────────────────────────
