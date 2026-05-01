@@ -99,19 +99,25 @@ kill-session -t <nom>     # ferme une session spécifique
 
 ## Layouts prédéfinis — `mux`
 
+Depuis le **shell** :
+
 ```bash
 mux              # lister les layouts disponibles
 mux ide          # auto : fenêtre si dans tmux, session sinon
 mux monitor      # idem pour le layout monitor
 ```
 
-Ou depuis le prompt tmux (`C-a :`) :
+Depuis **tmux** (après `C-a r` pour recharger la config) :
 
 ```
-mux ide          # ouvre le layout ide dans une nouvelle fenêtre
-mux monitor      # ouvre le layout monitor dans une nouvelle fenêtre
-mux              # affiche les layouts disponibles
+C-a : ide        # ouvre le layout ide dans une nouvelle fenêtre
+C-a : monitor    # ouvre le layout monitor
+C-a m            # prompt interactif : tape le nom du layout
 ```
+
+> `C-a : mux ide` ne fonctionne pas (limitation tmux : `run-shell` n'accepte
+> qu'un seul argument, mais `command-alias` en ajoute un second). Les layouts
+> sont donc enregistrés comme aliases directs (`ide`, `monitor`…) au rechargement.
 
 **Auto-détection** : `mux` détecte si tmux est actif.
 - Appelé **depuis tmux** → ouvre un nouveau **window** dans la session courante
