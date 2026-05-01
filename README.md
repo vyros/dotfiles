@@ -9,7 +9,7 @@ Configuration personnelle pour un environnement de développement en ligne de co
 | [Vim](vim/README.md) | Configuration IDE (LSP, fzf, bat preview, git, glow) |
 | [tmux](tmux/README.md) | Multiplexeur de terminal (Gruvbox, sessions persistantes) |
 | [Git](git/README.md) | Aliases et paramètres (delta pour les diffs) |
-| Fish | Intégration zoxide, fzf, eza, lazygit, uv |
+| Fish / Bash | Intégration zoxide, fzf, eza, lazygit, uv |
 | Bat | Thème Gruvbox, pager pour man |
 
 ## Outils inclus
@@ -65,7 +65,8 @@ Les symlinks créés :
 | `~/.vim/setup.sh` | `dotfiles/vim/setup.sh` |
 | `~/.tmux.conf` | `dotfiles/tmux/tmux.conf` |
 | `~/.gitconfig` | inclut `dotfiles/git/gitconfig` via `[include]` |
-| `~/.config/fish/conf.d/tools.fish` | `dotfiles/fish/conf.d/tools.fish` |
+| `~/.config/fish/conf.d/tools.fish` | `dotfiles/fish/conf.d/tools.fish` (fish) |
+| `~/.bashrc` | source de `dotfiles/bash/tools.sh` (bash) |
 | `~/.config/bat/config` | `dotfiles/bat/config` |
 
 > **Note :** `~/.gitconfig` n'est pas remplacé — la section `[user]` (nom, email) reste locale à chaque machine.
@@ -99,9 +100,11 @@ dotfiles/
 ├── install.sh                      ← point d'entrée
 ├── bat/
 │   └── config                      ← thème Gruvbox
+├── bash/
+│   └── tools.sh                    ← zoxide, fzf, eza, lazygit, uv (bash)
 ├── fish/
 │   └── conf.d/
-│       └── tools.fish              ← zoxide, fzf, eza, lazygit, uv
+│       └── tools.fish              ← zoxide, fzf, eza, lazygit, uv (fish)
 ├── git/
 │   ├── gitconfig                   ← aliases et delta
 │   └── README.md

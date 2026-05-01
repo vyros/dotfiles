@@ -35,29 +35,31 @@ echo
 do_vim=false
 do_tmux=false
 do_git=false
-do_fish=false
+do_shell=false
 do_bat=false
 do_deps=false
 
-ask "Vim"          && do_vim=true  || true
-ask "tmux"         && do_tmux=true || true
-ask "Git"          && do_git=true  || true
-ask "Fish"         && do_fish=true || true
-ask "Bat"          && do_bat=true  || true
-ask "Dépendances (LSP, plugins vim/tmux)" n && do_deps=true || true
+CURRENT_SHELL=$(basename "${SHELL:-bash}")
+
+ask "Vim"                                    && do_vim=true   || true
+ask "tmux"                                   && do_tmux=true  || true
+ask "Git"                                    && do_git=true   || true
+ask "Shell ($CURRENT_SHELL)"                 && do_shell=true || true
+ask "Bat"                                    && do_bat=true   || true
+ask "Dépendances (LSP, plugins vim/tmux)" n  && do_deps=true  || true
 
 # ── Résumé ────────────────────────────────────────────────────────────────────
 echo
 echo "  Composants sélectionnés :"
-$do_vim  && echo "    • Vim"  || true
-$do_tmux && echo "    • tmux" || true
-$do_git  && echo "    • Git"  || true
-$do_fish && echo "    • Fish" || true
-$do_bat  && echo "    • Bat"  || true
-$do_deps && echo "    • Dépendances" || true
+$do_vim   && echo "    • Vim"               || true
+$do_tmux  && echo "    • tmux"              || true
+$do_git   && echo "    • Git"               || true
+$do_shell && echo "    • Shell ($CURRENT_SHELL)" || true
+$do_bat   && echo "    • Bat"               || true
+$do_deps  && echo "    • Dépendances"       || true
 echo
 
-if ! $do_vim && ! $do_tmux && ! $do_git && ! $do_fish && ! $do_bat && ! $do_deps; then
+if ! $do_vim && ! $do_tmux && ! $do_git && ! $do_shell && ! $do_bat && ! $do_deps; then
     info "Rien à installer."
     exit 0
 fi
@@ -91,11 +93,27 @@ if $do_git; then
     info "~/.gitconfig ← include $DOTFILES/git/gitconfig"
 fi
 
-# ── Fish ──────────────────────────────────────────────────────────────────────
-if $do_fish; then
-    header "Fish"
-    mkdir -p "$HOME/.config/fish/conf.d"
-    symlink "$DOTFILES/fish/conf.d/tools.fish" "$HOME/.config/fish/conf.d/tools.fish"
+# ── Shell ─────────────────────────────────────────────────────────────────────
+if $do_shell; then
+    header "Shell ($CURRENT_SHELL)"
+    case "$CURRENT_SHELL" in
+        fish)
+            mkdir -p "$HOME/.config/fish/conf.d"
+            symlink "$DOTFILES/fish/conf.d/tools.fish" "$HOME/.config/fish/conf.d/tools.fish"
+            ;;
+        bash)
+            local_line="source $DOTFILES/bash/tools.sh"
+            if ! grep -qF "$local_line" "$HOME/.bashrc" 2>/dev/null; then
+                echo "$local_line" >> "$HOME/.bashrc"
+                info "Ajouté à ~/.bashrc"
+            else
+                info "~/.bashrc déjà configuré"
+            fi
+            ;;
+        *)
+            warning "Shell '$CURRENT_SHELL' non supporté (fish et bash uniquement)"
+            ;;
+    esac
 fi
 
 # ── Bat ───────────────────────────────────────────────────────────────────────
