@@ -86,13 +86,27 @@ mux ide -s       # forcer une nouvelle session
 mux monitor -w   # layout monitor dans une nouvelle fenêtre
 ```
 
+Ou depuis le prompt tmux (`C-a :`) :
+
+```
+ide              # ouvre le layout ide dans une nouvelle fenêtre
+monitor          # ouvre le layout monitor dans une nouvelle fenêtre
+```
+
 **Auto-détection** : `mux` détecte si tmux est actif.
 - Appelé **depuis tmux** → ouvre un nouveau **window** dans la session courante
 - Appelé **hors tmux** → crée une nouvelle **session**
 
 Si une session du même nom existe déjà, `mux` s'y reconnecte.
 
-### Ajouter un layout
+### Ajouter un layout et son alias tmux
+
+Ajouter dans `tmux/tmux.conf` :
+```
+set -ga command-alias '<nom>=run-shell "MUX_WINDOW=1 bash $HOME/.config/tmux/sessions/<nom>.sh"'
+```
+
+### Créer le script
 
 Créer un fichier `tmux/sessions/<nom>.sh` dans le repo dotfiles :
 
