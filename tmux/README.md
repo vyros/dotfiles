@@ -79,13 +79,18 @@ tmux source ~/.tmux.conf
 ## Layouts prédéfinis — `mux`
 
 ```bash
-mux           # lister les layouts disponibles
-mux ide       # vim + btop + lazygit
-mux monitor   # btop + journalctl + dmesg
+mux              # lister les layouts disponibles
+mux ide          # auto : fenêtre si dans tmux, session sinon
+mux ide -w       # forcer une nouvelle fenêtre (session courante)
+mux ide -s       # forcer une nouvelle session
+mux monitor -w   # layout monitor dans une nouvelle fenêtre
 ```
 
-Les layouts sont des scripts dans `~/.config/tmux/sessions/`. Si la session existe
-déjà, `mux` s'y reconnecte au lieu d'en créer une nouvelle.
+**Auto-détection** : `mux` détecte si tmux est actif.
+- Appelé **depuis tmux** → ouvre un nouveau **window** dans la session courante
+- Appelé **hors tmux** → crée une nouvelle **session**
+
+Si une session du même nom existe déjà, `mux` s'y reconnecte.
 
 ### Ajouter un layout
 

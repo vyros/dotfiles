@@ -46,22 +46,52 @@ end
 # ── mux (layouts tmux prédéfinis) ────────────────────────────────────────────
 function mux --description "Lance un layout tmux prédéfini"
     set sessions_dir "$HOME/.config/tmux/sessions"
+
+    # Sans argument : lister les layouts
     if test (count $argv) -eq 0
         if test -d "$sessions_dir"
             echo "Layouts disponibles :"
             for f in $sessions_dir/*.sh
                 echo "  mux "(basename $f .sh)
             end
+            echo
+            echo "Options : -w (fenêtre) -s (session)"
         else
             echo "Aucun layout trouvé dans $sessions_dir"
         end
         return 0
     end
-    set script "$sessions_dir/$argv[1].sh"
+
+    # Parser les arguments
+    set name ""
+    set mode "auto"  # auto | window | session
+    for arg in $argv
+        switch $arg
+            case -w --window;  set mode "window"
+            case -s --session; set mode "session"
+            case '*';          set name $arg
+        end
+    end
+
+    if test -z "$name"
+        echo "Usage : mux <layout> [-w|-s]" >&2; return 1
+    end
+
+    set script "$sessions_dir/$name.sh"
     if not test -f "$script"
-        echo "Layout '$argv[1]' introuvable." >&2
+        echo "Layout '$name' introuvable." >&2
         mux
         return 1
     end
-    bash "$script"
+
+    # Auto-détection : fenêtre si déjà dans tmux, session sinon
+    if test "$mode" = auto
+        if set -q TMUX
+            set mode "window"
+        else
+            set mode "session"
+        end
+    end
+
+    MUX_WINDOW=(test "$mode" = window; and echo 1; or echo 0) bash "$script"
 end

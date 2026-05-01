@@ -48,22 +48,44 @@ fi
 # ── mux (layouts tmux prédéfinis) ────────────────────────────────────────────
 mux() {
     local sessions_dir="$HOME/.config/tmux/sessions"
-    if [[ -z "${1:-}" ]]; then
+    local name="" mode="auto"
+
+    # Parser les arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -w|--window)  mode="window"  ;;
+            -s|--session) mode="session" ;;
+            *) name="$1" ;;
+        esac
+        shift
+    done
+
+    # Sans argument : lister les layouts
+    if [[ -z "$name" ]]; then
         if compgen -G "$sessions_dir/*.sh" &>/dev/null; then
             echo "Layouts disponibles :"
             for f in "$sessions_dir"/*.sh; do
                 echo "  mux $(basename "$f" .sh)"
             done
+            echo
+            echo "Options : -w (fenêtre) -s (session)"
         else
             echo "Aucun layout trouvé dans $sessions_dir"
         fi
         return 0
     fi
-    local script="$sessions_dir/$1.sh"
+
+    local script="$sessions_dir/$name.sh"
     if [[ ! -f "$script" ]]; then
-        echo "Layout '$1' introuvable." >&2
+        echo "Layout '$name' introuvable." >&2
         mux
         return 1
     fi
-    bash "$script"
+
+    # Auto-détection : fenêtre si déjà dans tmux, session sinon
+    if [[ "$mode" == "auto" ]]; then
+        [[ -n "${TMUX:-}" ]] && mode="window" || mode="session"
+    fi
+
+    MUX_WINDOW=$([[ "$mode" == "window" ]] && echo 1 || echo 0) bash "$script"
 }
