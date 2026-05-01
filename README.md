@@ -9,7 +9,7 @@ Configuration personnelle pour un environnement de développement en ligne de co
 | [Vim](vim/README.md) | Configuration IDE (LSP, fzf, bat preview, git, glow) |
 | [tmux](tmux/README.md) | Multiplexeur de terminal (Gruvbox, sessions persistantes) |
 | [Git](git/README.md) | Aliases et paramètres (delta pour les diffs) |
-| Fish / Bash | Intégration zoxide, fzf, eza, lazygit, uv |
+| Fish / Bash | Intégration zoxide, fzf, eza, lazygit, uv, Docker |
 | Bat | Thème Gruvbox, pager pour man |
 
 ## Outils inclus
@@ -28,6 +28,7 @@ Configuration personnelle pour un environnement de développement en ligne de co
 | `jq` | Processeur JSON |
 | `direnv` | Variables d'environnement par répertoire |
 | `btop` | Moniteur système |
+| `lazydocker` | TUI Docker interactif (containers, images, logs, stats) |
 
 ## Installation
 
@@ -87,7 +88,7 @@ C-a I
 
 Le script `vim/setup.sh` installe automatiquement les dépendances sur **Arch Linux** et **Debian 12+** :
 
-- Outils : `ripgrep`, `glow`, `fzf`, `fd`, `bat`, `delta`, `zoxide`, `lazygit`, `eza`, `jq`, `direnv`, `btop`
+- Outils : `ripgrep`, `glow`, `fzf`, `fd`, `bat`, `delta`, `zoxide`, `lazygit`, `lazydocker`, `eza`, `jq`, `direnv`, `btop`
 - Runtime : `nodejs`, `npm`, `pipx`, `rustup`
 - Compilateurs : `clangd`, `rust-analyzer`
 - Serveurs LSP Python : `pylsp`, `pyright`
@@ -101,10 +102,10 @@ dotfiles/
 ├── bat/
 │   └── config                      ← thème Gruvbox
 ├── bash/
-│   └── tools.sh                    ← zoxide, fzf, eza, lazygit, uv (bash)
+│   └── tools.sh                    ← zoxide, fzf, eza, lazygit, uv, docker (bash)
 ├── fish/
 │   └── conf.d/
-│       └── tools.fish              ← zoxide, fzf, eza, lazygit, uv (fish)
+│       └── tools.fish              ← zoxide, fzf, eza, lazygit, uv, docker (fish)
 ├── git/
 │   ├── gitconfig                   ← aliases et delta
 │   └── README.md
