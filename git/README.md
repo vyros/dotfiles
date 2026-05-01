@@ -45,6 +45,7 @@ git config --global include.path "~/dotfiles/git/gitconfig"
 | Alias | Commande | Description |
 |---|---|---|
 | `git a <fichier>` | `add` | Ajouter au stage |
+| `git aa` | `add .` | Ajouter tout le répertoire courant |
 | `git ap` | `add --patch` | Staging interactif par hunks |
 | `git d` | `diff` | Diff non stagé |
 | `git ds` | `diff --staged` | Diff stagé |
@@ -55,6 +56,7 @@ git config --global include.path "~/dotfiles/git/gitconfig"
 | Alias | Commande | Description |
 |---|---|---|
 | `git ci` | `commit` | Commit |
+| `git cm "message"` | `commit -m` | Commit avec message direct |
 | `git ca` | `commit --amend` | Amender le dernier commit |
 | `git can` | `commit --amend --no-edit` | Amender sans changer le message |
 | `git fixup` | `commit --fixup` | Commit fixup (pour rebase autosquash) |

@@ -56,12 +56,14 @@
     gone = "!git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -d"
     # ── Staging / Diff ────────────────────────────────────────
     a    = add
+    aa   = add .
     ap   = add --patch
     d    = diff
     ds   = diff --staged
     dw   = diff --word-diff=color
     # ── Commit ───────────────────────────────────────────────
     ci   = commit
+    cm   = commit -m
     ca   = commit --amend
     can  = commit --amend --no-edit
     fixup = commit --fixup
