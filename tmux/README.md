@@ -41,6 +41,8 @@ tmux source ~/.tmux.conf
 | `C-a c` | Nouvelle fenêtre (conserve le répertoire courant) |
 | `M-n` | Fenêtre suivante (sans préfixe) |
 | `M-p` | Fenêtre précédente (sans préfixe) |
+| `C-a &` | Fermer la fenêtre courante (confirmation demandée) |
+| `C-a x` | Fermer le panneau courant (confirmation demandée) |
 
 ### Sessions
 
@@ -48,8 +50,16 @@ tmux source ~/.tmux.conf
 |---|---|
 | `C-a $` | Renommer la session |
 | `C-a s` | Lister et switcher de session |
+| `C-a d` | Se détacher de la session (la session reste active en arrière-plan) |
 | `C-a C-s` | Sauvegarder la session (tmux-resurrect) |
 | `C-a C-r` | Restaurer la session (tmux-resurrect) |
+
+Fermer une session depuis le prompt tmux (`C-a :`) :
+
+```
+kill-session              # ferme la session courante
+kill-session -t <nom>     # ferme une session spécifique
+```
 
 > La session est aussi sauvegardée automatiquement toutes les **15 minutes** (tmux-continuum).
 
