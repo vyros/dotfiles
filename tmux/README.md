@@ -131,37 +131,44 @@ Il suffit de créer un fichier dans `tmux/sessions/` — aucune modification de 
 
 ### Créer le script
 
-Créer un fichier `tmux/sessions/<nom>.sh` dans le repo dotfiles :
+Créer un fichier `tmux/sessions/<nom>.sh` dans le repo dotfiles.
+Le boilerplate (création session/fenêtre, attach/switch) est mutualisé dans `_lib.sh` —
+le script ne contient que le `NAME` et la fonction `_build_layout` :
 
 ```bash
 #!/usr/bin/env bash
-SESSION="mon-layout"
+# Diagramme ASCII optionnel
 
-if tmux has-session -t "$SESSION" 2>/dev/null; then
-    [[ -z "$TMUX" ]] && tmux attach-session -t "$SESSION" \
-                     || tmux switch-client  -t "$SESSION"
-    exit 0
-fi
+NAME="mon-layout"
 
-tmux new-session -d -s "$SESSION"
+_build_layout() {
+    local p0="$1"
 
-# Pane 0 — commande principale
-tmux send-keys -t "$SESSION:0.0" "ma-commande" Enter
+    # Pane 0 — commande principale
+    tmux send-keys -t "$p0" "ma-commande" Enter
 
-# Pane 1 — split vertical droite (40%)
-tmux split-window -h -t "$SESSION:0.0" -p 40
-tmux send-keys -t "$SESSION:0.1" "autre-commande" Enter
+    # Pane 1 — split vertical droite (40%)
+    local p1; p1=$(tmux split-window -h -t "$p0" -p 40 -P -F '#{pane_id}')
+    tmux send-keys -t "$p1" "autre-commande" Enter
 
-tmux select-pane -t "$SESSION:0.0"
-[[ -z "$TMUX" ]] && tmux attach-session -t "$SESSION" \
-                 || tmux switch-client  -t "$SESSION"
+    # Pane 2 — split horizontal bas de p1 (50%)
+    local p2; p2=$(tmux split-window -v -t "$p1" -p 50 -P -F '#{pane_id}')
+    tmux send-keys -t "$p2" "encore-une-commande" Enter
+
+    tmux select-pane -t "$p0"
+}
+
+source "$(dirname "$0")/_lib.sh"
 ```
+
+> Les fichiers préfixés par `_` sont ignorés par `mux` (réservés aux bibliothèques).
 
 ### Layouts inclus
 
 | Layout | Contenu |
 |---|---|
 | `ide` | vim (droite) · btop (haut gauche) · lazygit (bas gauche) |
+| `clide` | vim (centre) · lazydocker+lazygit (gauche) · claude+terminal (droite) — ultrawide |
 | `monitor` | btop (gauche) · journalctl -f (haut droite) · dmesg (bas droite) |
 | `compose` | lazydocker (gauche) · shell (droite) |
 | `k8s` | k9s (gauche) · shell (droite) |

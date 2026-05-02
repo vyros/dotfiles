@@ -115,6 +115,7 @@ mux() {
         if compgen -G "$sessions_dir/*.sh" &>/dev/null; then
             echo "Layouts disponibles :"
             for f in "$sessions_dir"/*.sh; do
+                [[ "$(basename "$f")" == _* ]] && continue
                 echo "  mux $(basename "$f" .sh)"
             done
             echo

@@ -102,6 +102,7 @@ function mux --description "Lance un layout tmux prédéfini"
         if test -d "$sessions_dir"
             echo "Layouts disponibles :"
             for f in $sessions_dir/*.sh
+                string match -q '_*' (basename $f); and continue
                 echo "  mux "(basename $f .sh)
             end
             echo

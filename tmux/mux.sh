@@ -9,6 +9,7 @@ if [[ "$NAME" == "--init" ]]; then
     idx=100
     for script in "$SESSIONS_DIR"/*.sh; do
         [[ -f "$script" ]] || continue
+        [[ "$(basename "$script")" == _* ]] && continue
         layout=$(basename "$script" .sh)
         tmux set-option -g "command-alias[$idx]" \
             "${layout}=run-shell 'MUX_WINDOW=1 bash $script'"
@@ -19,7 +20,7 @@ fi
 
 if [[ -z "$NAME" ]]; then
     layouts=$(ls "$SESSIONS_DIR"/*.sh 2>/dev/null \
-        | xargs -n1 basename | sed 's/\.sh//' | tr '\n' ' ')
+        | xargs -n1 basename | grep -v '^_' | sed 's/\.sh//' | tr '\n' ' ')
     tmux display-message "Layouts disponibles : ${layouts:-aucun}"
     exit 0
 fi
