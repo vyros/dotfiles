@@ -143,7 +143,7 @@ nnoremap <leader>bl :ls<CR>:b<Space>
 nnoremap <leader>/ :nohlsearch<CR>
 
 " quick escape in insert mode
-inoremap jk <ESC>
+inoremap <C-Space> <Esc>
 
 " keep visual selection after indent
 vnoremap < <gv
