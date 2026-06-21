@@ -3,6 +3,11 @@ if type -q zoxide
     zoxide init fish | source
 end
 
+# ── direnv (variables d'environnement par répertoire) ─────────────────────────
+if type -q direnv
+    direnv hook fish | source
+end
+
 # ── fzf (fuzzy finder — raccourcis shell) ────────────────────────────────────
 # Ctrl+R : historique   Ctrl+T : fichiers   Alt+C : répertoires
 if type -q fzf

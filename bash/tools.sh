@@ -1,9 +1,15 @@
+# shellcheck shell=bash
 # Chargé depuis ~/.bashrc — configuration des outils CLI
 # Compatible bash 4+
 
 # ── zoxide (cd intelligent) ───────────────────────────────────────────────────
 if command -v zoxide &>/dev/null; then
     eval "$(zoxide init bash)"
+fi
+
+# ── direnv (variables d'environnement par répertoire) ─────────────────────────
+if command -v direnv &>/dev/null; then
+    eval "$(direnv hook bash)"
 fi
 
 # ── fzf (fuzzy finder — raccourcis shell) ────────────────────────────────────
@@ -48,10 +54,11 @@ fi
 # ── yazi (file manager — y pour changer de répertoire à la sortie) ───────────
 if command -v yazi &>/dev/null; then
     y() {
-        local tmp=$(mktemp -t "yazi-cwd.XXXXX")
+        local tmp
+        tmp=$(mktemp -t "yazi-cwd.XXXXX")
         yazi "$@" --cwd-file="$tmp"
         if cwd=$(cat -- "$tmp") && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-            cd -- "$cwd"
+            cd -- "$cwd" || return
         fi
         rm -f -- "$tmp"
     }
@@ -59,6 +66,7 @@ fi
 
 # ── Kubernetes ───────────────────────────────────────────────────────────────
 if command -v kubectl &>/dev/null; then
+    # shellcheck disable=SC1090  # process substitution, rien à suivre
     source <(kubectl completion bash)
     alias k='kubectl'
     alias kgp='kubectl get pods'
@@ -96,6 +104,7 @@ if command -v lazydocker &>/dev/null; then
 fi
 
 # ── mux (layouts tmux prédéfinis) ────────────────────────────────────────────
+# shellcheck disable=SC2120  # appelée par l'utilisateur, avec ou sans argument
 mux() {
     local sessions_dir="$HOME/.config/tmux/sessions"
     local name="" mode="auto"
