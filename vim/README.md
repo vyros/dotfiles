@@ -174,6 +174,6 @@ Les serveurs présents sur le système sont détectés et chargés automatiqueme
 | Raccourci | Action |
 |---|---|
 | `<leader>/` | Effacer la surbrillance de recherche |
-| `jk` | Quitter le mode insertion |
+| `<C-Space>` | Quitter le mode insertion |
 | `<A-j/k>` | Déplacer la ligne / sélection vers le bas/haut |
 | `<` / `>` (visuel) | Indenter en conservant la sélection |

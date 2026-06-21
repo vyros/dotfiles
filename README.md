@@ -9,7 +9,7 @@ Configuration personnelle pour un environnement de développement en ligne de co
 | [Vim](vim/README.md) | Configuration IDE (LSP, fzf, bat preview, git, glow) |
 | [tmux](tmux/README.md) | Multiplexeur de terminal (Gruvbox, sessions persistantes) |
 | [Git](git/README.md) | Aliases et paramètres (delta pour les diffs) |
-| Fish / Bash | Intégration zoxide, fzf, eza, lazygit, uv, Docker, Kubernetes |
+| Fish / Bash | Intégration zoxide, direnv, fzf, eza, lazygit, uv, Docker, Kubernetes |
 | Bat | Thème Gruvbox, pager pour man |
 
 ## Outils inclus
@@ -60,7 +60,7 @@ Le script propose de choisir les composants à installer :
     Vim [O/n]
     tmux [O/n]
     Git [O/n]
-    Fish [O/n]
+    Shell (fish) [O/n]
     Bat [O/n]
     Dépendances (LSP, plugins vim/tmux) [o/N]
 ```
@@ -93,7 +93,7 @@ C-a I
 
 ### Dépendances système
 
-Le script `vim/setup.sh` installe automatiquement les dépendances sur **Arch Linux** et **Debian 12+** :
+Le script `vim/setup.sh` installe automatiquement les dépendances sur **Arch Linux** et **Debian 12+** (**x86_64 uniquement** — il s'arrête avec un message sur ARM/autre archi) :
 
 - Outils : `ripgrep`, `glow`, `fzf`, `fd`, `bat`, `delta`, `zoxide`, `lazygit`, `lazydocker`, `yazi`, `yq`, `xh`, `dust`, `eza`, `jq`, `direnv`, `btop`
 - Kubernetes : `kubectl`, `k9s`, `kubectx`, `kubens`, `stern`
@@ -119,6 +119,10 @@ dotfiles/
 │   └── README.md
 ├── tmux/
 │   ├── tmux.conf
+│   ├── mux.sh                      ← dispatcher de layouts (C-a m / C-a :)
+│   ├── sessions/                   ← layouts mux (ide, clide, monitor, compose, k8s)
+│   │   ├── _lib.sh                 ← boilerplate mutualisé (création session/fenêtre)
+│   │   └── *.sh                    ← un fichier par layout
 │   └── README.md
 └── vim/
     ├── vimrc
