@@ -16,7 +16,7 @@ symlink() {
         warning "Sauvegarde de $dst → $dst.bak"
         mv "$dst" "$dst.bak"
     fi
-    ln -sf "$src" "$dst"
+    ln -sfn "$src" "$dst"          # -n : remplace un symlink de répertoire au lieu d'écrire dedans
     info "$dst → $src"
 }
 
@@ -92,8 +92,14 @@ fi
 # ── Git ───────────────────────────────────────────────────────────────────────
 if $do_git; then
     header "Git"
-    git config --global include.path "$DOTFILES/git/gitconfig"
-    info "~/.gitconfig ← include $DOTFILES/git/gitconfig"
+    # --add (et non set) pour ne pas écraser d'autres include.path éventuels ;
+    # guard grep pour éviter les doublons si on relance le script.
+    if git config --global --get-all include.path 2>/dev/null | grep -qxF "$DOTFILES/git/gitconfig"; then
+        info "$HOME/.gitconfig inclut déjà $DOTFILES/git/gitconfig"
+    else
+        git config --global --add include.path "$DOTFILES/git/gitconfig"
+        info "$HOME/.gitconfig ← include $DOTFILES/git/gitconfig"
+    fi
 fi
 
 # ── Shell ─────────────────────────────────────────────────────────────────────
@@ -110,7 +116,7 @@ if $do_shell; then
                 echo "$local_line" >> "$HOME/.bashrc"
                 info "Ajouté à ~/.bashrc"
             else
-                info "~/.bashrc déjà configuré"
+                info "$HOME/.bashrc déjà configuré"
             fi
             ;;
         *)

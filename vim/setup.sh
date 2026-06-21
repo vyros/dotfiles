@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 # Installe les dépendances et les serveurs LSP pour la config Vim IDE.
 # Usage : bash setup.sh
-# Testé sur : Arch Linux, Debian 12+
+# Testé sur : Arch Linux, Debian 12+ (x86_64 uniquement)
 
 set -euo pipefail
+
+# ── Vérification de l'architecture ────────────────────────────────────────────
+# Les binaires téléchargés depuis GitHub (eza, delta, k9s, xh, dust, yazi…) sont
+# en dur pour x86_64 ; les autres architectures ne sont pas (encore) supportées.
+ARCH=$(uname -m)
+if [[ $ARCH != x86_64 ]]; then
+    echo "[!] Architecture '$ARCH' non supportée." >&2
+    echo "    setup.sh installe des binaires x86_64 depuis GitHub ; sur ARM (aarch64)" >&2
+    echo "    ou autre, les téléchargements échoueraient. Installe les outils à la main." >&2
+    exit 1
+fi
 
 # ── Détection du gestionnaire de paquets ─────────────────────────────────────
 if command -v pacman &>/dev/null; then
@@ -61,6 +72,7 @@ if [[ $PM == arch ]]; then
         rustup \
         fzf git-delta zoxide ruff lazygit bat fd \
         jq direnv eza btop \
+        xclip wl-clipboard            `# presse-papier tmux (X11 + Wayland)` \
         ttf-hack-nerd \
         kubectl k9s kubectx \
         go-yq yazi xh dust
@@ -73,7 +85,8 @@ elif [[ $PM == debian ]]; then
     sudo apt-get install -y --no-install-recommends \
         ripgrep nodejs npm pipx curl \
         clangd \
-        fzf bat fd-find jq direnv btop
+        fzf bat fd-find jq direnv btop \
+        xclip wl-clipboard
 
     mkdir -p "$HOME/.local/bin"
 
@@ -202,7 +215,7 @@ if [[ -f $HOME/.vimrc ]]; then
     info "Installation des plugins Vim..."
     vim -es -u "$HOME/.vimrc" +PlugInstall +qall
 else
-    warning "~/.vimrc introuvable — copie-le avant de lancer ce script."
+    warning "$HOME/.vimrc introuvable — copie-le avant de lancer ce script."
 fi
 
 info "Terminé. Lance vim pour vérifier."
