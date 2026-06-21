@@ -29,7 +29,7 @@ tmux source ~/.tmux.conf
 |---|---|
 | `C-a \|` | Split vertical (conserve le répertoire courant) |
 | `C-a -` | Split horizontal (conserve le répertoire courant) |
-| `M-h/j/k/l` | Naviguer entre les panneaux (sans préfixe) |
+| `M-h/j/k/l` ou `M-←/↓/↑/→` | Naviguer entre les panneaux (sans préfixe) |
 | `C-a H/J/K/L` | Redimensionner le panneau |
 | `C-a y` | Synchroniser tous les panneaux (toggle) |
 | `C-a C-g` | Terminal flottant (popup 80x80%) |
@@ -40,7 +40,7 @@ tmux source ~/.tmux.conf
 |---|---|
 | `C-a c` | Nouvelle fenêtre (conserve le répertoire courant) |
 | `M-n` | Fenêtre suivante (sans préfixe) |
-| `M-p` | Fenêtre précédente (sans préfixe) |
+| `M-b` | Fenêtre précédente (sans préfixe) |
 | `C-a &` | Fermer la fenêtre courante (confirmation demandée) |
 | `C-a x` | Fermer le panneau courant (confirmation demandée) |
 
