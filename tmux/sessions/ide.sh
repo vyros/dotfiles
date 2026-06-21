@@ -7,6 +7,7 @@
 # |    lazygit       |                           |
 # +------------------+---------------------------+
 
+# shellcheck disable=SC2034  # NAME consommé par _lib.sh (sourcé en fin de fichier)
 NAME="ide"
 
 _build_layout() {
@@ -19,4 +20,5 @@ _build_layout() {
     tmux select-pane -t "$p1"
 }
 
+# shellcheck source=_lib.sh
 source "$(dirname "$0")/_lib.sh"

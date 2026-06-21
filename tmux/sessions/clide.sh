@@ -9,6 +9,7 @@
 # | lazygit  |                           |   terminal       |
 # +----------+---------------------------+------------------+
 
+# shellcheck disable=SC2034  # NAME consommé par _lib.sh (sourcé en fin de fichier)
 NAME="clide"
 
 _build_layout() {
@@ -20,8 +21,9 @@ _build_layout() {
     tmux send-keys -t "$p2" "claude -c" Enter
     local p3; p3=$(tmux split-window -v -t "$p0" -p 50 -P -F '#{pane_id}')
     tmux send-keys -t "$p3" "lazygit" Enter
-    local p4; p4=$(tmux split-window -v -t "$p2" -p 33 -P -F '#{pane_id}')
+    tmux split-window -v -t "$p2" -p 33   # terminal sous claude
     tmux select-pane -t "$p1"
 }
 
+# shellcheck source=_lib.sh
 source "$(dirname "$0")/_lib.sh"

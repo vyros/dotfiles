@@ -19,6 +19,7 @@ if [[ "$NAME" == "--init" ]]; then
 fi
 
 if [[ -z "$NAME" ]]; then
+    # shellcheck disable=SC2011  # noms de layouts contrôlés (pas d'espaces)
     layouts=$(ls "$SESSIONS_DIR"/*.sh 2>/dev/null \
         | xargs -n1 basename | grep -v '^_' | sed 's/\.sh//' | tr '\n' ' ')
     tmux display-message "Layouts disponibles : ${layouts:-aucun}"
