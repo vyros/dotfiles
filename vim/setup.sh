@@ -1,9 +1,57 @@
 #!/usr/bin/env bash
 # Installe les dépendances et les serveurs LSP pour la config Vim IDE.
-# Usage : bash setup.sh
+# Usage : bash setup.sh [--update] [--check]
 # Testé sur : Arch Linux, Debian 12+ (x86_64 uniquement)
 
 set -euo pipefail
+
+# ── Options de ligne de commande ──────────────────────────────────────────────
+FORCE_UPDATE=0
+DO_CHECK=0
+for arg in "$@"; do
+    case "$arg" in
+        --update) FORCE_UPDATE=1 ;;
+        --check)  DO_CHECK=1 ;;
+        -h|--help)
+            echo "Usage : bash setup.sh [--update] [--check]"
+            echo "  --update  réinstalle les binaires GitHub même s'ils sont déjà présents"
+            echo "  --check   liste les outils présents/manquants puis quitte (n'installe rien)"
+            exit 0 ;;
+        *) echo "Option inconnue : $arg (voir --help)" >&2; exit 1 ;;
+    esac
+done
+
+# ── Mode diagnostic (--check) : ne rien installer, juste lister ───────────────
+if [[ $DO_CHECK == 1 ]]; then
+    have() {  # have <label> <cmd…> : ✓ si l'une des commandes existe dans le PATH
+        local label="$1"; shift
+        local c
+        for c in "$@"; do
+            command -v "$c" &>/dev/null && { printf '  \033[32m✓\033[0m %s\n' "$label"; return; }
+        done
+        printf '  \033[31m✗\033[0m %s\n' "$label"
+    }
+    echo "Outils CLI :"
+    have ripgrep rg;            have fzf fzf;        have delta delta
+    have zoxide zoxide;         have uv uv;          have ruff ruff
+    have lazygit lazygit;       have bat bat batcat
+    have eza eza;               have fd fd fdfind;   have jq jq
+    have direnv direnv;         have btop btop;      have yazi yazi
+    have yq yq;                 have xh xh;          have dust dust
+    have lazydocker lazydocker; have glow glow;      have presse-papier wl-copy xclip
+    echo "Kubernetes :"
+    have kubectl kubectl;  have k9s k9s;  have kubectx kubectx;  have kubens kubens;  have stern stern
+    echo "Serveurs LSP :"
+    have clangd clangd;                              have pylsp pylsp
+    have pyright pyright-langserver;                 have rust-analyzer rust-analyzer
+    have typescript-language-server typescript-language-server
+    have gopls gopls;                                have lua-language-server lua-language-server
+    have docker-langserver docker-langserver
+    have docker-compose-langserver docker-compose-langserver
+    echo "Runtime :"
+    have node node;  have npm npm;  have pipx pipx;  have rustup rustup;  have vim vim
+    exit 0
+fi
 
 # ── Vérification de l'architecture ────────────────────────────────────────────
 # Les binaires téléchargés depuis GitHub (eza, delta, k9s, xh, dust, yazi…) sont
@@ -33,7 +81,7 @@ warning() { echo "[!] $*"; }
 # Usage : github_install <owner/repo> <grep_pattern> <binaire> [<deb|bin>]
 github_install() {
     local repo="$1" pattern="$2" binary="$3" kind="${4:-deb}"
-    if command -v "$binary" &>/dev/null; then
+    if [[ $FORCE_UPDATE != 1 ]] && command -v "$binary" &>/dev/null; then
         info "$binary déjà installé"
         return
     fi
