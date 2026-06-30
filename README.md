@@ -1,5 +1,7 @@
 # dotfiles
 
+![lint](https://github.com/vyros/dotfiles/actions/workflows/lint.yml/badge.svg)
+
 Configuration personnelle pour un environnement de développement en ligne de commande.
 
 ## Composants
@@ -90,6 +92,19 @@ Les symlinks créés :
 ```
 C-a I
 ```
+
+### Mise à jour & maintenance
+
+```bash
+cd ~/dotfiles && git pull          # récupère les nouvelles configs (symlinks déjà à jour)
+
+bash install.sh --link             # (re)pose tous les symlinks, sans menu ni dépendances
+bash vim/setup.sh --check          # liste les outils présents/manquants (doctor)
+bash vim/setup.sh --update         # réinstalle les binaires GitHub même déjà présents (eza, k9s…)
+```
+
+> Modifier une config déjà liée (ex. `tmux.conf`) ne nécessite pas de relancer `install.sh` :
+> le symlink reflète déjà le repo. Il suffit de recharger l'outil concerné (`C-a r` pour tmux, etc.).
 
 ### Dépendances système
 
