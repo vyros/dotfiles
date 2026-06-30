@@ -39,27 +39,41 @@ github_install() {
     fi
     info "Installation de $binary depuis GitHub ($repo)..."
     local url
-    url=$(curl -s "https://api.github.com/repos/$repo/releases/latest" \
-        | grep "browser_download_url" | grep "$pattern" | head -1 | cut -d'"' -f4)
+    url=$(curl -fsS "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null \
+        | grep "browser_download_url" | grep -E "$pattern" | head -1 | cut -d'"' -f4)
     if [[ -z $url ]]; then
         warning "$binary : asset introuvable (pattern: $pattern)" ; return
     fi
-    if [[ $kind == deb ]]; then
-        curl -sLo /tmp/_pkg.deb "$url"
-        sudo dpkg -i /tmp/_pkg.deb
-        rm /tmp/_pkg.deb
-    elif [[ $kind == raw ]]; then
-        curl -sLo "$HOME/.local/bin/$binary" "$url"
-        chmod +x "$HOME/.local/bin/$binary"
-    else
-        # binaire dans une archive (tar.gz, tar.xz, tar.zst…)
-        curl -sLo /tmp/_pkg.tar "$url"
-        tar -xf /tmp/_pkg.tar -C /tmp "$binary" 2>/dev/null \
-            || tar -xf /tmp/_pkg.tar -C /tmp --wildcards "*/$binary" 2>/dev/null \
-            || tar -xf /tmp/_pkg.tar -C /tmp
-        install -m755 /tmp/"$binary" "$HOME/.local/bin/$binary"
-        rm -f /tmp/_pkg.tar /tmp/"$binary"
+
+    local tmpd; tmpd=$(mktemp -d)
+    if ! curl -fsSLo "$tmpd/pkg" "$url"; then
+        warning "$binary : téléchargement échoué" ; rm -rf "$tmpd" ; return
     fi
+
+    case "$kind" in
+        deb)
+            sudo dpkg -i "$tmpd/pkg" || warning "$binary : dpkg a échoué (dépendances ?)"
+            ;;
+        raw)
+            install -m755 "$tmpd/pkg" "$HOME/.local/bin/$binary"
+            ;;
+        *)  # archive (tar.* ou .zip) de structure inconnue : on localise le binaire
+            if [[ $url == *.zip ]]; then
+                unzip -qo "$tmpd/pkg" -d "$tmpd" 2>/dev/null
+            else
+                tar -xf "$tmpd/pkg" -C "$tmpd" 2>/dev/null
+            fi
+            local found
+            found=$(find "$tmpd" -type f -name "$binary" -perm -u+x -print -quit 2>/dev/null)
+            [[ -z $found ]] && found=$(find "$tmpd" -type f -name "$binary" -print -quit 2>/dev/null)
+            if [[ -n $found ]]; then
+                install -m755 "$found" "$HOME/.local/bin/$binary"
+            else
+                warning "$binary introuvable dans l'archive"
+            fi
+            ;;
+    esac
+    rm -rf "$tmpd"
 }
 
 # ── Paquets système ───────────────────────────────────────────────────────────
@@ -78,7 +92,7 @@ if [[ $PM == arch ]]; then
         go-yq yazi xh dust
 
     # stern non disponible dans les dépôts officiels
-    github_install "stern/stern" "stern_linux_amd64" "stern" bin
+    github_install "stern/stern" "linux_amd64.tar.gz" "stern" bin
 
 elif [[ $PM == debian ]]; then
     sudo apt-get update -qq
@@ -86,7 +100,7 @@ elif [[ $PM == debian ]]; then
         ripgrep nodejs npm pipx curl \
         clangd \
         fzf bat fd-find jq direnv btop \
-        xclip wl-clipboard
+        xclip wl-clipboard unzip
 
     mkdir -p "$HOME/.local/bin"
 
@@ -131,14 +145,14 @@ elif [[ $PM == debian ]]; then
         install -m755 /tmp/kubectl "$HOME/.local/bin/kubectl"
         rm /tmp/kubectl
     fi
-    github_install "derailed/k9s"    "k9s_Linux_amd64.tar.gz" "k9s"      bin
-    github_install "ahmetb/kubectx"  "kubectx_v"              "kubectx"  bin
-    github_install "ahmetb/kubectx"  "kubens_v"               "kubens"   bin
-    github_install "stern/stern"      "stern_linux_amd64"           "stern"    bin
+    github_install "derailed/k9s"    "k9s_Linux_amd64.tar.gz"  "k9s"      bin
+    github_install "ahmetb/kubectx"  "kubectx.*linux_x86_64"   "kubectx"  bin
+    github_install "ahmetb/kubectx"  "kubens.*linux_x86_64"    "kubens"   bin
+    github_install "stern/stern"     "linux_amd64.tar.gz"      "stern"    bin
 
     # yq, yazi, xh, dust
-    github_install "mikefarah/yq"    "yq_linux_amd64\""            "yq"       raw
-    github_install "sxyazi/yazi"     "yazi-x86_64-unknown-linux-musl.tar.gz" "yazi" bin
+    github_install "mikefarah/yq"    "yq_linux_amd64\""                      "yq"   raw
+    github_install "sxyazi/yazi"     "yazi-x86_64-unknown-linux-musl.zip"    "yazi" bin
     github_install "ducaale/xh"      "x86_64-unknown-linux-musl.tar.gz"      "xh"   bin
     github_install "bootandy/dust"   "x86_64-unknown-linux-musl.tar.gz"      "dust" bin
 
