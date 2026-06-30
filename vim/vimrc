@@ -86,6 +86,7 @@ set wildmenu
 set wildmode=longest:full,full
 
 function! LspStatus() abort
+    if !exists('*lsp#lsp#ErrorCount') | return '' | endif
     let l:counts = lsp#lsp#ErrorCount()
     if empty(l:counts) | return '' | endif
     let l:e = get(l:counts, 'Error', 0)
@@ -97,7 +98,7 @@ set statusline=
 set statusline+=%f             " filename
 set statusline+=\ %m%r         " modified/readonly
 set statusline+=%=             " right side
-set statusline+=%{FugitiveStatusline()} " git branch
+set statusline+=%{exists('*FugitiveStatusline')?FugitiveStatusline():''} " git branch
 set statusline+=%{LspStatus()} " LSP diagnostics
 set statusline+=\ %Y           " filetype
 set statusline+=\ %l:%c        " line:col
@@ -142,8 +143,9 @@ nnoremap <leader>bl :ls<CR>:b<Space>
 " clear search highlight
 nnoremap <leader>/ :nohlsearch<CR>
 
-" quick escape in insert mode
+" quick escape in insert mode (<C-Space> arrive souvent comme <C-@>/NUL en terminal)
 inoremap <C-Space> <Esc>
+inoremap <C-@> <Esc>
 
 " keep visual selection after indent
 vnoremap < <gv
@@ -347,6 +349,10 @@ augroup END
 let s:glow_buf = -1
 
 function! s:GlowPreview()
+    if !executable('glow')
+        echohl WarningMsg | echo 'glow non installé' | echohl None
+        return
+    endif
     let l:src_win = winnr()
     let l:file = expand('%:p')
 
