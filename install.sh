@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 # Installe la config en créant des symlinks depuis ~ vers ce repo.
-# Usage : bash install.sh
+# Usage : bash install.sh [--link]
 
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# ── Options ───────────────────────────────────────────────────────────────────
+LINK_ALL=0
+for arg in "$@"; do
+    case "$arg" in
+        --link) LINK_ALL=1 ;;
+        -h|--help)
+            echo "Usage : bash install.sh [--link]"
+            echo "  --link   (re)pose tous les symlinks sans menu ni dépendances"
+            exit 0 ;;
+        *) echo "Option inconnue : $arg (voir --help)" >&2; exit 1 ;;
+    esac
+done
 
 info()    { echo "[+] $*"; }
 warning() { echo "[!] $*"; }
@@ -29,9 +42,7 @@ ask() {
     [[ ${answer,,} == o ]]
 }
 
-# ── Menu de sélection ─────────────────────────────────────────────────────────
-header "Dotfiles — sélection des composants"
-echo
+# ── Sélection des composants ──────────────────────────────────────────────────
 do_vim=false
 do_tmux=false
 do_git=false
@@ -41,30 +52,37 @@ do_deps=false
 
 CURRENT_SHELL=$(basename "${SHELL:-bash}")
 
-ask "Vim"                                    && do_vim=true   || true
-ask "tmux"                                   && do_tmux=true  || true
-ask "Git"                                    && do_git=true   || true
-ask "Shell ($CURRENT_SHELL)"                 && do_shell=true || true
-ask "Bat"                                    && do_bat=true   || true
-ask "Dépendances (LSP, plugins vim/tmux)" n  && do_deps=true  || true
+if [[ $LINK_ALL == 1 ]]; then
+    # Mode non-interactif : (re)pose tous les symlinks, sans dépendances
+    do_vim=true; do_tmux=true; do_git=true; do_shell=true; do_bat=true
+    info "Mode --link : (re)pose tous les symlinks (sans installer de dépendances)."
+else
+    header "Dotfiles — sélection des composants"
+    echo
+    ask "Vim"                                    && do_vim=true   || true
+    ask "tmux"                                   && do_tmux=true  || true
+    ask "Git"                                    && do_git=true   || true
+    ask "Shell ($CURRENT_SHELL)"                 && do_shell=true || true
+    ask "Bat"                                    && do_bat=true   || true
+    ask "Dépendances (LSP, plugins vim/tmux)" n  && do_deps=true  || true
 
-# ── Résumé ────────────────────────────────────────────────────────────────────
-echo
-echo "  Composants sélectionnés :"
-$do_vim   && echo "    • Vim"               || true
-$do_tmux  && echo "    • tmux"              || true
-$do_git   && echo "    • Git"               || true
-$do_shell && echo "    • Shell ($CURRENT_SHELL)" || true
-$do_bat   && echo "    • Bat"               || true
-$do_deps  && echo "    • Dépendances"       || true
-echo
+    echo
+    echo "  Composants sélectionnés :"
+    $do_vim   && echo "    • Vim"               || true
+    $do_tmux  && echo "    • tmux"              || true
+    $do_git   && echo "    • Git"               || true
+    $do_shell && echo "    • Shell ($CURRENT_SHELL)" || true
+    $do_bat   && echo "    • Bat"               || true
+    $do_deps  && echo "    • Dépendances"       || true
+    echo
 
-if ! $do_vim && ! $do_tmux && ! $do_git && ! $do_shell && ! $do_bat && ! $do_deps; then
-    info "Rien à installer."
-    exit 0
+    if ! $do_vim && ! $do_tmux && ! $do_git && ! $do_shell && ! $do_bat && ! $do_deps; then
+        info "Rien à installer."
+        exit 0
+    fi
+
+    ask "Confirmer l'installation ?" || exit 0
 fi
-
-ask "Confirmer l'installation ?" || exit 0
 
 # ── Vim ───────────────────────────────────────────────────────────────────────
 if $do_vim; then
