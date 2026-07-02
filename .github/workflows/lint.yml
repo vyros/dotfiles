@@ -12,7 +12,42 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y shellcheck fish
 
       - name: shellcheck (scripts bash/sh)
-        run: find . -name '*.sh' -print0 | xargs -0 -r shellcheck -S warning
+        # -x -P SCRIPTDIR : suit les fichiers sourcés (tmux/sessions/_lib.sh)
+        run: find . -name '*.sh' -print0 | xargs -0 -r shellcheck -x -P SCRIPTDIR -S warning
 
       - name: fish -n (config fish)
         run: find . -name '*.fish' -print0 | xargs -0 -r -I{} fish -n {}
+
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install.sh --link (pose des symlinks, idempotent)
+        run: |
+          bash install.sh --link
+          bash install.sh --link
+          test -L ~/.vimrc && test -L ~/.tmux.conf && test -L ~/.config/bat/config
+
+  # Vérifie que chaque paquet visé par setup.sh existe dans les dépôts de la
+  # distribution — aurait attrapé « pipx » (Arch : python-pipx) avant le merge.
+  paquets:
+    name: paquets (${{ matrix.image }})
+    runs-on: ubuntu-latest
+    container: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ['archlinux:latest', 'ubuntu:24.04', 'debian:12']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Résolution des paquets dans les dépôts
+        run: |
+          if command -v pacman >/dev/null; then
+            pacman -Sy --noconfirm >/dev/null
+            bash vim/setup.sh --packages arch | xargs pacman -Sp >/dev/null
+          else
+            apt-get update -qq
+            bash vim/setup.sh --packages debian | xargs apt-get install --dry-run -qq >/dev/null
+          fi
