@@ -162,7 +162,9 @@ vnoremap <A-k> :move '<-2<CR>gv=gv
 " ============================================================
 nnoremap <leader>tt :terminal<CR>
 nnoremap <leader>tv :vertical terminal<CR>
-tnoremap <Esc> <C-\><C-n>         " exit terminal mode with Esc
+" exit terminal mode with Esc (un commentaire en fin de :map ferait partie du
+" mapping — :help map-comments)
+tnoremap <Esc> <C-\><C-n>
 
 " ============================================================
 " FZF
