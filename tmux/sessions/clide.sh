@@ -15,13 +15,13 @@ NAME="clide"
 _build_layout() {
     local p0="$1"
     tmux send-keys -t "$p0" "lazydocker" Enter
-    local p1; p1=$(tmux split-window -h -t "$p0" -p 80 -P -F '#{pane_id}')
-    local p2; p2=$(tmux split-window -h -t "$p1" -p 44 -P -F '#{pane_id}')
+    local p1; p1=$(tmux split-window -h -t "$p0" -l 80% -P -F '#{pane_id}')
+    local p2; p2=$(tmux split-window -h -t "$p1" -l 44% -P -F '#{pane_id}')
     tmux send-keys -t "$p1" "vim" Enter
     tmux send-keys -t "$p2" "claude -c" Enter
-    local p3; p3=$(tmux split-window -v -t "$p0" -p 50 -P -F '#{pane_id}')
+    local p3; p3=$(tmux split-window -v -t "$p0" -l 50% -P -F '#{pane_id}')
     tmux send-keys -t "$p3" "lazygit" Enter
-    tmux split-window -v -t "$p2" -p 33   # terminal sous claude
+    tmux split-window -v -t "$p2" -l 33%   # terminal sous claude
     tmux select-pane -t "$p1"
 }
 
