@@ -2,6 +2,18 @@
 # Chargé depuis ~/.bashrc — configuration des outils CLI
 # Compatible bash 4+
 
+# ── PATH — binaires installés par setup.sh ────────────────────────────────────
+# ~/.local/bin : binaires GitHub, pipx, uv, LSP npm ; ~/.cargo/bin : rustup.
+# Arch ne les ajoute pas d'office, Ubuntu seulement au login (via ~/.profile,
+# et uniquement si le répertoire existait déjà à ce moment-là).
+for _dir in "$HOME/.local/bin" "$HOME/.cargo/bin"; do
+    if [[ -d $_dir && ":$PATH:" != *":$_dir:"* ]]; then
+        PATH="$_dir:$PATH"
+    fi
+done
+unset _dir
+export PATH
+
 # ── zoxide (cd intelligent) ───────────────────────────────────────────────────
 if command -v zoxide &>/dev/null; then
     eval "$(zoxide init bash)"
@@ -14,11 +26,14 @@ fi
 
 # ── fzf (fuzzy finder — raccourcis shell) ────────────────────────────────────
 # Ctrl+R : historique   Ctrl+T : fichiers   Alt+C : répertoires
+# --bash disponible depuis fzf 0.48 ; sinon fichiers fournis par la distro
 if command -v fzf &>/dev/null; then
-    if fzf --bash &>/dev/null 2>&1; then
+    if fzf --bash &>/dev/null; then
         eval "$(fzf --bash)"
-    elif [[ -f /usr/share/fzf/key-bindings.bash ]]; then
+    elif [[ -f /usr/share/fzf/key-bindings.bash ]]; then                  # Arch
         source /usr/share/fzf/key-bindings.bash
+    elif [[ -f /usr/share/doc/fzf/examples/key-bindings.bash ]]; then     # Debian/Ubuntu
+        source /usr/share/doc/fzf/examples/key-bindings.bash
     fi
 fi
 

@@ -1,3 +1,8 @@
+# ── PATH — binaires installés par setup.sh ────────────────────────────────────
+# ~/.local/bin : binaires GitHub, pipx, uv, LSP npm ; ~/.cargo/bin : rustup.
+# fish ne lit pas ~/.profile : sans ceci, ces outils restent introuvables.
+fish_add_path --path $HOME/.local/bin $HOME/.cargo/bin
+
 # ── zoxide (cd intelligent) ───────────────────────────────────────────────────
 if type -q zoxide
     zoxide init fish | source
@@ -11,11 +16,17 @@ end
 # ── fzf (fuzzy finder — raccourcis shell) ────────────────────────────────────
 # Ctrl+R : historique   Ctrl+T : fichiers   Alt+C : répertoires
 if type -q fzf
-    # --fish disponible depuis fzf 0.48 ; fallback pour Debian (0.38)
-    if fzf --fish &>/dev/null 2>&1
+    # --fish disponible depuis fzf 0.48 ; sinon fichiers fournis par la distro
+    # (ces derniers ne font que définir fzf_key_bindings, il faut l'appeler)
+    if fzf --fish &>/dev/null
         fzf --fish | source
-    else if test -f /usr/share/fzf/key-bindings.fish
-        source /usr/share/fzf/key-bindings.fish
+    else
+        if test -f /usr/share/fzf/key-bindings.fish                    # Arch
+            source /usr/share/fzf/key-bindings.fish
+        else if test -f /usr/share/doc/fzf/examples/key-bindings.fish  # Debian/Ubuntu
+            source /usr/share/doc/fzf/examples/key-bindings.fish
+        end
+        functions -q fzf_key_bindings; and fzf_key_bindings
     end
 end
 
