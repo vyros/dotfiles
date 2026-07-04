@@ -156,6 +156,18 @@ if $do_git; then
         git config --global --add include.path "$DOTFILES/git/gitconfig"
         info "$HOME/.gitconfig ← include $DOTFILES/git/gitconfig"
     fi
+    # delta : pager de diff du gitconfig (rendu side-by-side/gruvbox). Non
+    # bloquant — le gitconfig retombe sur less sans lui. Paquet « git-delta »
+    # (fournit la commande « delta ») : présent sur Arch, Ubuntu 24.04+ et
+    # Debian 13+ ; absent de Debian 12 (bookworm), où il reste couvert par
+    # l'étape « Dépendances » (setup.sh, .deb GitHub).
+    if [[ $LINK_ALL == 0 ]]; then
+        if command -v delta >/dev/null 2>&1; then
+            info "delta déjà présent."
+        elif ask "Installer delta (pager de diff git) ?"; then
+            pkg_install git-delta
+        fi
+    fi
 fi
 
 # ── Shell ─────────────────────────────────────────────────────────────────────

@@ -83,6 +83,8 @@ Les symlinks créés :
 
 > **Presse-papier :** choisir **tmux** propose aussi d'installer `wl-clipboard` (Wayland) et `xclip` (X11) via le gestionnaire de paquets (`pacman`/`apt`). Sans eux, la copie du mode copie tmux (`y`, souris) ne sort pas vers le presse-papier système. Ignoré avec `--link`.
 
+> **Diff git :** choisir **Git** propose d'installer `git-delta` (pager de diff du gitconfig, rendu side-by-side/gruvbox). Présent sur Arch, Ubuntu 24.04+ et Debian 13+ ; absent des dépôts de Debian 12 (bookworm), où le gitconfig retombe sur `less` et delta s'obtient via l'étape « Dépendances ». Ignoré avec `--link`.
+
 ### Après installation
 
 **Vim** — installer les plugins :
