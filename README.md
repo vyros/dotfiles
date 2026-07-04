@@ -81,6 +81,8 @@ Les symlinks créés :
 
 > **Note :** `~/.gitconfig` n'est pas remplacé — la section `[user]` (nom, email) reste locale à chaque machine.
 
+> **Presse-papier :** choisir **tmux** propose aussi d'installer `wl-clipboard` (Wayland) et `xclip` (X11) via le gestionnaire de paquets (`pacman`/`apt`). Sans eux, la copie du mode copie tmux (`y`, souris) ne sort pas vers le presse-papier système. Ignoré avec `--link`.
+
 ### Après installation
 
 **Vim** — installer les plugins :

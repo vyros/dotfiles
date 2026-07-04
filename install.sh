@@ -42,6 +42,33 @@ ask() {
     [[ ${answer,,} == o ]]
 }
 
+# Détecte le gestionnaire de paquets système. Écho : arch | debian | (vide).
+detect_pm() {
+    if command -v pacman &>/dev/null; then
+        echo arch
+    elif command -v apt-get &>/dev/null; then
+        echo debian
+    fi
+}
+
+# Installe des paquets système (mêmes noms sur Arch et Debian/Ubuntu ici).
+# N'interrompt pas le script en cas d'échec (réseau, sudo refusé) : avertit.
+# pacman -S sans -y volontaire : évite un partial upgrade ; pour une machine à
+# jour c'est suffisant, sinon lancer l'étape « Dépendances » (pacman -Syu).
+pkg_install() {
+    case "$(detect_pm)" in
+        arch)
+            sudo pacman -S --needed --noconfirm "$@" \
+                || warning "Échec de l'installation : $*" ;;
+        debian)
+            sudo apt-get update -qq \
+                && sudo apt-get install -y --no-install-recommends "$@" \
+                || warning "Échec de l'installation : $*" ;;
+        *)
+            warning "Gestionnaire de paquets non reconnu (ni pacman ni apt) — installe à la main : $*" ;;
+    esac
+}
+
 # ── Sélection des composants ──────────────────────────────────────────────────
 do_vim=false
 do_tmux=false
@@ -104,6 +131,17 @@ if $do_tmux; then
     if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
         info "Bootstrap de TPM..."
         git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    fi
+    # Presse-papier système du mode copie (touche « y » / souris). Sans
+    # wl-clipboard (Wayland) ou xclip (X11), la sélection ne quitte pas tmux.
+    # Ignoré en --link (contrat « sans dépendances ») ; noms partagés avec
+    # vim/setup.sh, source de vérité pour la CI « paquets ».
+    if [[ $LINK_ALL == 0 ]]; then
+        if command -v wl-copy &>/dev/null || command -v xclip &>/dev/null; then
+            info "Presse-papier système déjà présent (wl-copy/xclip)."
+        elif ask "Installer wl-clipboard + xclip (presse-papier tmux) ?"; then
+            pkg_install wl-clipboard xclip
+        fi
     fi
 fi
 
