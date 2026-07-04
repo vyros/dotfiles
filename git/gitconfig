@@ -2,10 +2,14 @@
     editor = vim
     autocrlf = input
     whitespace = fix,trailing-space,cr-at-eol
-    pager = delta
+    # delta si présent, sinon less : évite « unable to execute pager 'delta' »
+    # sur une machine sans delta. Guillemets obligatoires (les ; sont sinon
+    # traités comme des commentaires par git-config).
+    pager = "if command -v delta >/dev/null 2>&1; then delta; else less; fi"
 
 [interactive]
-    diffFilter = delta --color-only
+    # delta si présent, sinon cat (git add -p reste utilisable sans delta)
+    diffFilter = "if command -v delta >/dev/null 2>&1; then delta --color-only; else cat; fi"
 
 [delta]
     navigate    = true
